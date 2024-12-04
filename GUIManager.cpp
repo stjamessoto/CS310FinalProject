@@ -1,5 +1,4 @@
 //GUIManager.cpp
-// GUIManager.cpp
 #include "GUIManager.h"
 
 GUIManager::GUIManager(sf::RenderWindow& win)
@@ -49,7 +48,7 @@ void GUIManager::addVisualNode(int value, sf::Vector2f position) {
 void GUIManager::highlightNode(int value) {
     try {
         for (auto& node : visualNodes) {
-            if (std::stoi(node.valueText.getString()) == value) {
+            if (std::stoi(node.valueText.getString().toAnsiString()) == value) {
                 node.circle.setFillColor(sf::Color::Yellow);
             } else {
                 node.circle.setFillColor(sf::Color::White);

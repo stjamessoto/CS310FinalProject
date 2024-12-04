@@ -1,5 +1,4 @@
 //AVL.h
-//AVL.h
 #ifndef AVL_H
 #define AVL_H
 
@@ -7,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <unordered_map>
 
 struct AVLNode {
     int key;
@@ -28,6 +28,10 @@ public:
     void parseFromFile(const std::string& fileName);
     void display() const;
 
+    // New Methods
+    int getDepth(int key) const;
+    int getOrder(int key) const;
+
 private:
     AVLNode* root;
 
@@ -42,6 +46,10 @@ private:
 
     void inOrderTraversal(AVLNode* node) const;
     void clear(AVLNode* node);
+
+    // Helper functions for new methods
+    int calculateDepth(AVLNode* node, int key, int depth) const;
+    int calculateOrder(AVLNode* node, int key, int& order) const;
 };
 
 #endif // AVL_H
