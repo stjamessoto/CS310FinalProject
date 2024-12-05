@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 
 enum Color { RED, BLACK };
 
@@ -36,6 +37,8 @@ private:
 
 public:
     RedBlackTree();
+    ~RedBlackTree();
+
     void insert(int key);
     bool search(int key);
     void deleteValue(int key);

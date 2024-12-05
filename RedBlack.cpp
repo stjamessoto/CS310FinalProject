@@ -5,14 +5,24 @@
 RedBlackTree::RedBlackTree() {
     TNULL = new RBNode(0);
     TNULL->color = BLACK;
+    TNULL->left = nullptr;
+    TNULL->right = nullptr;
     root = TNULL;
+}
+
+// Destructor
+RedBlackTree::~RedBlackTree() {
+    while (root != TNULL) {
+        deleteValue(root->data);
+    }
+    delete TNULL;
 }
 
 void RedBlackTree::initializeNULLNode(RBNode* node, RBNode* parent) {
     node->data = 0;
     node->parent = parent;
-    node->left = nullptr;
-    node->right = nullptr;
+    node->left = TNULL;
+    node->right = TNULL;
     node->color = BLACK;
 }
 
@@ -57,11 +67,8 @@ RBNode* RedBlackTree::searchTreeHelper(RBNode* node, int key) {
 // Insert a new value
 void RedBlackTree::insert(int key) {
     RBNode* node = new RBNode(key);
-    node->parent = nullptr;
-    node->data = key;
     node->left = TNULL;
     node->right = TNULL;
-    node->color = RED;
 
     RBNode* y = nullptr;
     RBNode* x = root;
@@ -82,6 +89,7 @@ void RedBlackTree::insert(int key) {
     } else {
         y->right = node;
     }
+
     if (node->parent == nullptr) {
         node->color = BLACK;
         return;
@@ -99,7 +107,7 @@ void RedBlackTree::deleteValue(int key) {
 
 // Display the tree
 void RedBlackTree::display() {
-    if (root) {
+    if (root != TNULL) {
         inOrderHelper(root);
         std::cout << std::endl;
     } else {
@@ -114,7 +122,7 @@ bool RedBlackTree::search(int key) {
 
 // Parse values from a file
 void RedBlackTree::parseFromFile(const std::string& filename) {
-    std::ifstream file("sample.txt");
+    std::ifstream file(filename);
     if (!file) {
         std::cerr << "File not found: " << filename << std::endl;
         return;
@@ -124,5 +132,4 @@ void RedBlackTree::parseFromFile(const std::string& filename) {
         insert(value);
     }
     file.close();
-}    
-    
+}
