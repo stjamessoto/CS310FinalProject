@@ -1,6 +1,11 @@
 //GUIManager.cpp
 #include "GUIManager.h"
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <stdexcept>
 
+// Constructor
 GUIManager::GUIManager(sf::RenderWindow& win)
     : window(win), currentADT(ADTType::HEAP), inputBuffer(""), inputMode(false), selectedOption(-1), btree(3) {
     adtNames = {
@@ -19,14 +24,32 @@ GUIManager::GUIManager(sf::RenderWindow& win)
     }
 }
 
+// Load Initial Data from File
+void GUIManager::loadInitialData(const std::string& filePath) {
+    std::ifstream inputFile(filePath);
+    if (!inputFile) {
+        throw std::runtime_error("Failed to open file: " + filePath);
+    }
+
+    int value;
+    while (inputFile >> value) {
+        sf::Vector2f position = calculateNodePosition(value);
+        addVisualNode(value, position);
+    }
+
+    std::cout << "Initial data loaded from " << filePath << "\n";
+}
+
+// Calculate Node Position
 sf::Vector2f GUIManager::calculateNodePosition(int value) {
-    int depth = avl.getDepth(value); // Ensure this method is implemented in AVL class
-    int order = avl.getOrder(value); // Ensure this method is implemented in AVL class
+    int depth = avl.getDepth(value); // Ensure AVL has getDepth method
+    int order = avl.getOrder(value); // Ensure AVL has getOrder method
     float x = window.getSize().x / (1 << depth) * order;
     float y = 100.f + depth * 50.f;
     return sf::Vector2f(x, y);
 }
 
+// Add Visual Node
 void GUIManager::addVisualNode(int value, sf::Vector2f position) {
     TreeNodeVisual nodeVisual;
     nodeVisual.circle.setRadius(20.f);
@@ -45,6 +68,7 @@ void GUIManager::addVisualNode(int value, sf::Vector2f position) {
     visualNodes.push_back(nodeVisual);
 }
 
+// Highlight Node
 void GUIManager::highlightNode(int value) {
     try {
         for (auto& node : visualNodes) {
@@ -59,6 +83,7 @@ void GUIManager::highlightNode(int value) {
     }
 }
 
+// Update Node Positions
 void GUIManager::updateNodePositions() {
     for (auto& node : visualNodes) {
         sf::Vector2f current = node.circle.getPosition();
@@ -70,6 +95,7 @@ void GUIManager::updateNodePositions() {
     }
 }
 
+// Handle Input
 void GUIManager::handleInput(int value) {
     try {
         sf::Vector2f position;
@@ -111,6 +137,7 @@ void GUIManager::handleInput(int value) {
     }
 }
 
+// Render
 void GUIManager::render() {
     window.clear();
 
@@ -123,11 +150,13 @@ void GUIManager::render() {
     window.display();
 }
 
+// Browse File
 std::string GUIManager::browseFile() {
     std::cout << "Simulating file selection... (default: sample.txt)\n";
     return "sample.txt";
 }
 
+// Process Events
 void GUIManager::processEvent(sf::Event& event) {
     if (event.type == sf::Event::KeyPressed) {
         if (event.key.code == sf::Keyboard::Enter && inputMode) {
@@ -148,3 +177,4 @@ void GUIManager::processEvent(sf::Event& event) {
         }
     }
 }
+
