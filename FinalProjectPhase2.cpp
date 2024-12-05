@@ -1,9 +1,9 @@
 // Tasks: Replace the placeholder menu options with: ADT selection, operations: Insert, Delete， Search. Import values from a file. Add fuctionality to capture and display values in real-time. Allows users to browse and select a file. Parse the file and  populate the selected adt.
 // Describe each step. Include test cases and how to run the applicaton.
 #include "heap.h"
-#include "BstFinal.h"
-#include "stack.h"
-#include "queueFinal.h"
+#include "Bst.h"
+#include "Stack.h"
+#include "Queue.h"
 #include "PriorityQueue.h"
 #include "AVL.h"
 #include "BTree.h"
@@ -14,6 +14,59 @@
 #include <vector>
 #include <string>
 #include <filesystem>
+
+// Simple Menu class definition
+class Menu {
+private:
+    int selectedItemIndex;
+    sf::Font font;
+    std::vector<sf::Text> menuItems;
+
+public:
+    Menu(float width, float height) {
+        if (!font.loadFromFile("edosz.ttf")) {
+            std::cerr << "Failed to load font!\n";
+        }
+
+        std::vector<std::string> options = {"Select ADT", "Insert", "Delete", "Search", "Import from File"};
+        for (size_t i = 0; i < options.size(); ++i) {
+            sf::Text text;
+            text.setFont(font);
+            text.setString(options[i]);
+            text.setFillColor(i == 0 ? sf::Color::Red : sf::Color::White);
+            text.setPosition(sf::Vector2f(width / 2 - 50, height / (options.size() + 1) * (i + 1)));
+            menuItems.push_back(text);
+        }
+
+        selectedItemIndex = 0;
+    }
+
+    void draw(sf::RenderWindow& window) {
+        for (const auto& item : menuItems) {
+            window.draw(item);
+        }
+    }
+
+    void moveUp() {
+        if (selectedItemIndex - 1 >= 0) {
+            menuItems[selectedItemIndex].setFillColor(sf::Color::White);
+            selectedItemIndex--;
+            menuItems[selectedItemIndex].setFillColor(sf::Color::Red);
+        }
+    }
+
+    void moveDown() {
+        if (selectedItemIndex + 1 < menuItems.size()) {
+            menuItems[selectedItemIndex].setFillColor(sf::Color::White);
+            selectedItemIndex++;
+            menuItems[selectedItemIndex].setFillColor(sf::Color::Red);
+        }
+    }
+
+    int getSelectedItemIndex() const {
+        return selectedItemIndex;
+    }
+};
 
 enum class ADTType { HEAP, BST, AVL, BTREE, STACK, QUEUE, PRIORITY_QUEUE, RED_BLACK_TREE };
 
@@ -105,7 +158,7 @@ int main() {
                                 heap.displayHeap();
                             } else if (currentADT == ADTType::BST) {
                                 bst.parseFromFile(fileName);
-                                bst.display();
+                                bst.displayTree();
                             } else if (currentADT == ADTType::BTREE) {
                                 btree.parseFromFile(fileName);
                                 btree.display();
@@ -147,7 +200,7 @@ int main() {
                             else if (selectedOption == 2) bst.deleteValue(value);
                             else if (selectedOption == 3)
                                 std::cout << (bst.search(value) ? "Value found.\n" : "Value not found.\n");
-                            bst.display();
+                            bst.displayTree();
                         } else if (currentADT == ADTType::BTREE) {
                             if (selectedOption == 1) btree.insert(value);
                             else if (selectedOption == 3)

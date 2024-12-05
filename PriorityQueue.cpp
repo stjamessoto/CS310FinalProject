@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 
 // Helper function: Swap two heap elements
 void PriorityQueue::heapifyUp(int index) {

@@ -30,6 +30,18 @@ std::vector<int> readFromFile(const std::string& filename) {
     return data;
 }
 
+// Helper function to serialize a vector of integers into a comma-separated string
+std::string serializeVector(const std::vector<int>& data) {
+    std::string serialized;
+    for (size_t i = 0; i < data.size(); ++i) {
+        serialized += std::to_string(data[i]);
+        if (i < data.size() - 1) {
+            serialized += ","; // Add a comma between numbers
+        }
+    }
+    return serialized;
+}
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Menu with ADTs");
     GUIManager guiManager(window); // Use the GUIManager for handling ADTs and their visualization
@@ -45,8 +57,11 @@ int main() {
         }
         std::cout << "\n";
 
-        // Load data into the initial ADT (default is Heap in this example)
-        guiManager.loadInitialData(initialData);
+        // Serialize the vector into a string
+        std::string serializedData = serializeVector(initialData);
+
+        // Load serialized data into the GUIManager
+        guiManager.loadInitialData(serializedData);
     } else {
         std::cout << "No data loaded from " << filename << ".\n";
     }

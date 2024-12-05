@@ -1,5 +1,21 @@
 //AVL.cpp
 #include "AVL.h"
+#include <fstream>
+#include <iostream>
+
+void AVL::parseFromFile(const std::string& fileName){
+
+    std::ifstream file(fileName);
+    if (!file.is_open()) {
+        std::cerr <<"Error opening file:" << fileName << "\n";
+        return;
+    }
+    int value;
+    while (file >> value){
+        insert(value);
+    }
+    file.close();
+}
 
 AVL::AVL() : root(nullptr) {}
 AVL::~AVL() { clear(root); }

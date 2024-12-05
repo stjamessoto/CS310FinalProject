@@ -35,6 +35,10 @@ private:
     RBNode* minimum(RBNode* node);
     void deleteNodeHelper(RBNode* node, int key);
 
+    // Add declarations for rotations
+    void leftRotate(RBNode* x);
+    void rightRotate(RBNode* x);
+
 public:
     RedBlackTree();
     ~RedBlackTree();
