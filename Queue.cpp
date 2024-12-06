@@ -1,5 +1,7 @@
 //Queue.cpp
 #include "Queue.h"
+#include <iostream>
+#include <SFML/Graphics.hpp>
 
 void Queue::enqueue(int value) {
     // Add an element to the back of the queue
@@ -45,6 +47,12 @@ void Queue::draw(sf::RenderWindow& window) {
     float yPos = 50.0f;
     float offset = 40.0f; // Spacing between elements
 
+    sf::Font font;
+    if (!font.loadFromFile("edosz.ttf")) { // Ensure the font file is in the correct path
+        std::cerr << "Failed to load font!" << std::endl;
+        return;
+    }
+
     for (int value : queue) {
         // Create a rectangle for each element in the queue
         sf::RectangleShape rectangle(sf::Vector2f(30.0f, 30.0f));
@@ -52,11 +60,6 @@ void Queue::draw(sf::RenderWindow& window) {
         rectangle.setFillColor(sf::Color::Green);
 
         // Create text to display the value inside the rectangle
-        sf::Font font;
-        if (!font.loadFromFile("edosz.ttf")) {  // Make sure you have the correct path to the font
-            std::cerr << "Failed to load font!" << std::endl;
-        }
-
         sf::Text text;
         text.setFont(font);
         text.setString(std::to_string(value));
@@ -69,18 +72,5 @@ void Queue::draw(sf::RenderWindow& window) {
         window.draw(text);
 
         xPos += offset;  // Move the position for the next element
-    }
-}
-
-void Queue::print() const {
-    // Print the elements of the queue to the console
-    std::cout << "Queue: ";
-    if (queue.empty()) {
-        std::cout << "Empty\n";
-    } else {
-        for (const int& value : queue) {
-            std::cout << value << " ";
-        }
-        std::cout << "\n";
     }
 }

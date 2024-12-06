@@ -112,7 +112,7 @@ void BST::parseFromFile(const std::string& fileName) {
 }
 
 // Helper function to draw nodes
-void BST::drawNode(sf::RenderWindow& window, Node* node, float x, float y, float offset) {
+void BST::drawNode(sf::RenderWindow& window, Node* node, float x, float y, float offset) const {
     if (node == nullptr) return;
 
     // Draw the node value as a circle

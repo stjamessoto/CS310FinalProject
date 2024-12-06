@@ -10,7 +10,7 @@
 #include <SFML/Graphics.hpp>
 
 class BST {
-private:
+protected: // Changed from `private` to allow access to `Node` from `bst.cpp`
     struct Node {
         int value;
         Node* left;
@@ -28,6 +28,7 @@ private:
     void inorderTraversal(Node* node, std::ostream& os) const;
     void clearTree(Node* node);
     void printTree(Node* node, int space, int indent = 4) const; // Helper for print()
+    void drawNode(sf::RenderWindow& window, Node* node, float x, float y, float offset) const; // Helper for draw()
 
 public:
     BST();
@@ -46,3 +47,4 @@ public:
 };
 
 #endif
+

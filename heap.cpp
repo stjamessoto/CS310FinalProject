@@ -1,4 +1,4 @@
-#include "Heap.h"
+#include "heap.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>

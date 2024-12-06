@@ -213,7 +213,7 @@ int main() {
                             else if (currentADT == ADTType::RED_BLACK_TREE) rbt.insert(value);
                             else if (currentADT == ADTType::STACK) stack.push(value);
                             else if (currentADT == ADTType::QUEUE) queue.enqueue(value);
-                            else if (currentADT == ADTType::PRIORITY_QUEUE) priorityQueue.enqueue(value);
+                            else if (currentADT == ADTType::PRIORITY_QUEUE) priorityQueue.enqueue(value, priority);
                         } else if (operationMenu.getSelectedItemIndex() == 1) { // Delete
                             if (currentADT == ADTType::HEAP) heap.deleteValue(value);
                             else if (currentADT == ADTType::BST) bst.deleteValue(value);

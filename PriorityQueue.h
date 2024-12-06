@@ -18,22 +18,13 @@ private:
 public:
     PriorityQueue() = default;
 
-    void enqueue(int value, int priority);
+    void enqueue(int value, int priority = 0);
     void dequeue();
     std::pair<int, int> peek() const;
     bool isEmpty() const;
 
     // Display function to print the contents of the priority queue
-    void print() const {
-        if (heap.empty()) {
-            std::cout << "Priority Queue is empty.\n";
-            return;
-        }
-        std::cout << "Priority Queue contents:\n";
-        for (const auto& item : heap) {
-            std::cout << "Priority: " << item.first << ", Value: " << item.second << '\n';
-        }
-    }
+    void print() const;
 
     void draw(sf::RenderWindow& window);
 

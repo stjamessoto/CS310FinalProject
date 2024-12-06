@@ -1,4 +1,3 @@
-//AVL.h
 #ifndef AVL_H
 #define AVL_H
 
@@ -55,6 +54,9 @@ private:
     int calculateOrder(AVLNode* node, int key, int& order) const;
 
     void printInOrder(AVLNode* node) const; // Helper for the print method
+
+    // Search helper function
+    bool searchHelper(AVLNode* node, int key) const; // Added declaration
 };
 
 #endif // AVL_H

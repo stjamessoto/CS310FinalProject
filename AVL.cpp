@@ -1,13 +1,14 @@
-//AVL.cpp
-#include "AVL.h"#include <SFML/Graphics.hpp>
 #include "AVL.h"
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 // Constructor and Destructor
 AVL::AVL() : root(nullptr) {}
-AVL::~AVL() { clear(root); }
+
+AVL::~AVL() {
+    clear(root);
+}
 
 // Insert and Delete Operations
 void AVL::insert(int key) {
@@ -213,4 +214,30 @@ int AVL::calculateOrder(AVLNode* node, int key, int& order) const {
     return order; // Key found
 }
 
+// Search Function
+bool AVL::search(int key) const {
+    return searchHelper(root, key);
+}
 
+// The missing searchHelper function
+bool AVL::searchHelper(AVLNode* node, int key) const {
+    if (node == nullptr) {
+        return false; // Key not found
+    }
+    if (key == node->key) {
+        return true; // Key found
+    }
+    if (key < node->key) {
+        return searchHelper(node->left, key); // Search in the left subtree
+    } else {
+        return searchHelper(node->right, key); // Search in the right subtree
+    }
+}
+
+void AVL::draw(sf::RenderWindow& window) {
+    // For drawing AVL Tree, you need to implement visualization with SFML (optional)
+}
+
+void AVL::display() const {
+    print(); // Display AVL tree using in-order traversal
+}

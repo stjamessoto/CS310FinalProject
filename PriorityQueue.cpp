@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <SFML/Graphics.hpp>
 
 // Helper function to maintain the heap property after adding an element (heapify upwards)
 void PriorityQueue::heapifyUp(int index) {
@@ -73,8 +74,8 @@ void PriorityQueue::print() const {
         return;
     }
     std::cout << "Priority Queue contents:\n";
-    for (const auto& pair : heap) {
-        std::cout << "Priority: " << pair.first << ", Value: " << pair.second << '\n';
+    for (const auto& item : heap) {
+        std::cout << "Priority: " << item.first << ", Value: " << item.second << '\n';
     }
 }
 
@@ -133,4 +134,31 @@ void PriorityQueue::draw(sf::RenderWindow& window) {
             window.draw(line, 2, sf::Lines);
         }
     }
+}
+
+// Parse data from a file and populate the priority queue
+void PriorityQueue::parseFromFile(const std::string& filename) {
+    // Open the file
+    std::ifstream file(filename);
+    
+    // Check if the file is open
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return;
+    }
+
+    // Temporary variables to hold values and priorities
+    int value, priority;
+
+    // Read the file line by line
+    while (file >> value >> priority) {
+        // Enqueue the value with the specified priority
+        enqueue(value, priority);
+    }
+
+    // Close the file
+    file.close();
+
+    // Inform the user that the file has been parsed successfully
+    std::cout << "File parsed successfully: " << filename << std::endl;
 }
