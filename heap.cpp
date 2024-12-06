@@ -1,8 +1,7 @@
-#include "heap.h"
+#include "Heap.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <SFML/Graphics.hpp>
 
 // Constructor
 Heap::Heap() {}
@@ -128,4 +127,13 @@ void Heap::draw(sf::RenderWindow& window) {
             window.draw(line, 2, sf::Lines);
         }
     }
+}
+
+// Print the heap state to the console
+void Heap::print() const {
+    std::cout << "Heap contents: ";
+    for (int val : heap) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
 }

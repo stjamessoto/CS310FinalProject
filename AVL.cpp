@@ -1,4 +1,5 @@
 //AVL.cpp
+#include "AVL.h"#include <SFML/Graphics.hpp>
 #include "AVL.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -17,7 +18,7 @@ void AVL::deleteValue(int key) {
     root = deleteNode(root, key);
 }
 
-// In-Order Traversal and Parsing from File
+// Parsing from File
 void AVL::parseFromFile(const std::string& fileName) {
     std::ifstream file(fileName);
     if (!file.is_open()) {
@@ -29,6 +30,26 @@ void AVL::parseFromFile(const std::string& fileName) {
         insert(value);
     }
     file.close();
+}
+
+// Print Function
+void AVL::print() const {
+    if (root == nullptr) {
+        std::cout << "The AVL tree is empty.\n";
+    } else {
+        std::cout << "AVL Tree (In-Order Traversal): ";
+        printInOrder(root);
+        std::cout << "\n";
+    }
+}
+
+// Helper function for in-order traversal
+void AVL::printInOrder(AVLNode* node) const {
+    if (node == nullptr) return;
+
+    printInOrder(node->left);
+    std::cout << node->key << " ";
+    printInOrder(node->right);
 }
 
 // Get Depth and Order of Node
@@ -173,19 +194,6 @@ void AVL::clear(AVLNode* node) {
     }
 }
 
-void AVL::inOrderTraversal(AVLNode* node) const {
-    if (node) {
-        inOrderTraversal(node->left);
-        std::cout << node->key << " ";
-        inOrderTraversal(node->right);
-    }
-}
-
-void AVL::display() const {
-    inOrderTraversal(root);
-    std::cout << std::endl;
-}
-
 int AVL::calculateDepth(AVLNode* node, int key, int depth) const {
     if (!node) return -1; // Node not found
     if (key == node->key) return depth;
@@ -203,48 +211,6 @@ int AVL::calculateOrder(AVLNode* node, int key, int& order) const {
     }
     if (node->left) order += node->left->height;
     return order; // Key found
-}
-
-// Visualizing the AVL tree with SFML
-void AVL::drawNode(sf::RenderWindow& window, AVLNode* node, float x, float y, float offset) {
-    if (!node) return;
-
-    // Draw the node (circle)
-    sf::CircleShape shape(20);
-    shape.setFillColor(sf::Color::Green);
-    shape.setPosition(x - 20, y - 20);
-    window.draw(shape);
-
-    // Draw the text inside the node
-    sf::Font font;
-    font.loadFromFile("arial.ttf"); // Ensure you have this font or another
-    sf::Text text(std::to_string(node->key), font, 15);
-    text.setPosition(x - 10, y - 10);
-    text.setFillColor(sf::Color::White);
-    window.draw(text);
-
-    // Draw edges to children (if they exist)
-    if (node->left) {
-        sf::Vertex line[] = {
-            sf::Vertex(sf::Vector2f(x, y)),
-            sf::Vertex(sf::Vector2f(x - offset, y + 100))
-        };
-        window.draw(line, 2, sf::Lines);
-        drawNode(window, node->left, x - offset, y + 100, offset / 2);
-    }
-    if (node->right) {
-        sf::Vertex line[] = {
-            sf::Vertex(sf::Vector2f(x, y)),
-            sf::Vertex(sf::Vector2f(x + offset, y + 100))
-        };
-        window.draw(line, 2, sf::Lines);
-        drawNode(window, node->right, x + offset, y + 100, offset / 2);
-    }
-}
-
-// Top-level draw function
-void AVL::draw(sf::RenderWindow& window) {
-    drawNode(window, root, window.getSize().x / 2, 50, 100);
 }
 
 

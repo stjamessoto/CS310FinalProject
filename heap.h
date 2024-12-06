@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 class Heap {
 private:
@@ -20,7 +21,10 @@ public:
     bool search(int value);      // Search for a value in the heap
     void parseFromFile(const std::string& fileName); // Populate heap from a file
     void displayHeap();          // Display the heap contents
-    void draw (sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window);
+
+    // Print the current heap state to the console
+    void print() const;
 };
 
 #endif

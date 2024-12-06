@@ -1,5 +1,5 @@
 // RedBlack.cpp
-#include "RedBlack.h"
+#include "RedBlackTree.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -308,6 +308,12 @@ void RedBlackTree::balanceDelete(RBNode* x) {
 void RedBlackTree::display() {
     // Implement this function if needed for printing or debugging.
     // For example, you could use inOrderHelper for an in-order traversal print
+    inOrderHelper(root);
+    std::cout << std::endl;
+}
+
+void RedBlackTree::print() {
+    std::cout << "In-order Traversal: ";
     inOrderHelper(root);
     std::cout << std::endl;
 }

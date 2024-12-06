@@ -24,6 +24,14 @@ void BTreeNode::traverse() {
     }
 }
 
+// Print the keys of the current node
+void BTreeNode::print() {
+    for (int key : keys) {
+        std::cout << key << " ";
+    }
+    std::cout << std::endl;
+}
+
 // Search a key in this node
 bool BTreeNode::search(int key) {
     int i = 0;
@@ -91,6 +99,13 @@ BTree::BTree(int t) {
 void BTree::traverse() {
     if (root != nullptr) {
         root->traverse();
+    }
+}
+
+// Print the entire tree (in-order traversal)
+void BTree::print() {
+    if (root != nullptr) {
+        root->print();
     }
 }
 
@@ -170,4 +185,30 @@ void BTree::draw(sf::RenderWindow& window) {
         drawNode(window, root, 400, 50, 200);
     }
 }
+
+// Public method to delete a value from the tree
+void BTree::deleteValue(int key) {
+    deleteValueFromNode(root, key);
+}
+
+// Helper function to delete a value from a node
+void BTree::deleteValueFromNode(BTreeNode* node, int key) {
+    int i = 0;
+    while (i < node->keys.size() && node->keys[i] < key) {
+        i++;
+    }
+
+    if (i < node->keys.size() && node->keys[i] == key) {
+        if (node->isLeaf) {
+            node->keys.erase(node->keys.begin() + i);
+        } else {
+            // Handle internal node deletion (complex logic needed)
+        }
+    } else if (!node->isLeaf) {
+        deleteValueFromNode(node->children[i], key);
+    }
+}
+
+
+
 

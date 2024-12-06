@@ -1,6 +1,7 @@
 //stack.cpp
 #include "Stack.h"
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 // Push an element onto the stack
 void Stack::push(int value) {
@@ -79,5 +80,18 @@ void Stack::draw(sf::RenderWindow& window) {
 
         // Draw the text
         window.draw(text);
+    }
+}
+
+// Print the stack contents to the console
+void Stack::print() const {
+    std::cout << "Stack contents (top to bottom): ";
+    if (stack.empty()) {
+        std::cout << "The stack is empty.\n";
+    } else {
+        for (int i = stack.size() - 1; i >= 0; --i) {
+            std::cout << stack[i] << " ";
+        }
+        std::cout << "\n";
     }
 }

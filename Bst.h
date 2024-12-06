@@ -27,6 +27,7 @@ private:
     bool searchNode(Node* node, int value);
     void inorderTraversal(Node* node, std::ostream& os) const;
     void clearTree(Node* node);
+    void printTree(Node* node, int space, int indent = 4) const; // Helper for print()
 
 public:
     BST();
@@ -39,6 +40,9 @@ public:
     void displayTree() const;
     void parseFromFile(const std::string& fileName);
     void draw(sf::RenderWindow& window);
+
+    // New function
+    void print() const;
 };
 
 #endif

@@ -1,5 +1,4 @@
 //Queue.cpp
-#include <SFML/Graphics.hpp>
 #include "Queue.h"
 
 void Queue::enqueue(int value) {
@@ -70,5 +69,18 @@ void Queue::draw(sf::RenderWindow& window) {
         window.draw(text);
 
         xPos += offset;  // Move the position for the next element
+    }
+}
+
+void Queue::print() const {
+    // Print the elements of the queue to the console
+    std::cout << "Queue: ";
+    if (queue.empty()) {
+        std::cout << "Empty\n";
+    } else {
+        for (const int& value : queue) {
+            std::cout << value << " ";
+        }
+        std::cout << "\n";
     }
 }

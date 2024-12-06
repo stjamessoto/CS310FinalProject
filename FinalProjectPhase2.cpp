@@ -73,6 +73,41 @@ public:
     }
 };
 
+// Function to view the current state of the ADT
+void viewADT(ADTType currentADT, Heap& heap, BST& bst, AVL& avl, BTree& btree, RedBlackTree& rbt,
+             Stack& stack, Queue& queue, PriorityQueue& priorityQueue) {
+    std::cout << "Viewing the current ADT state:\n";
+
+    switch (currentADT) {
+    case ADTType::HEAP:
+        heap.print(); // Assume `print` function exists for Heap
+        break;
+    case ADTType::BST:
+        bst.print(); // Assume `print` function exists for BST
+        break;
+    case ADTType::AVL:
+        avl.print(); // Assume `print` function exists for AVL
+        break;
+    case ADTType::BTREE:
+        btree.print(); // Assume `print` function exists for BTree
+        break;
+    case ADTType::RED_BLACK_TREE:
+        rbt.print(); // Assume `print` function exists for Red-Black Tree
+        break;
+    case ADTType::STACK:
+        stack.print(); // Assume `print` function exists for Stack
+        break;
+    case ADTType::QUEUE:
+        queue.print(); // Assume `print` function exists for Queue
+        break;
+    case ADTType::PRIORITY_QUEUE:
+        priorityQueue.print(); // Assume `print` function exists for Priority Queue
+        break;
+    default:
+        std::cerr << "No ADT selected or viewing not supported.\n";
+    }
+}
+
 std::string browseFile() {
     std::cout << "Simulating file selection... (default: sample.txt)\n";
     return "sample.txt";
@@ -82,9 +117,9 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Menu with ADTs");
     AppState appState = AppState::MAIN_MENU;
 
-    Menu mainMenu(window.getSize().x, window.getSize().y, {"Select ADT", "Insert", "Delete", "Search", "Import from File"});
+    Menu mainMenu(window.getSize().x, window.getSize().y, {"Select ADT", "Insert", "Delete", "Search", "View ADT", "Import from File"});
     Menu adtMenu(window.getSize().x, window.getSize().y, {"Heap", "BST", "AVL", "BTree", "Stack", "Queue", "Priority Queue", "Red-Black Tree"});
-    Menu operationMenu(window.getSize().x, window.getSize().y, {"Insert", "Delete", "Search"});
+    Menu operationMenu(window.getSize().x, window.getSize().y, {"Insert", "Delete", "Search", "View"});
 
     ADTType currentADT = ADTType::HEAP; // Default ADT
 
@@ -120,7 +155,9 @@ int main() {
                         selectedOption = mainMenu.getSelectedItemIndex();
                         if (selectedOption == 0) { // Go to ADT selection
                             appState = AppState::ADT_SELECTION;
-                        } else if (selectedOption == 4) { // Import from file
+                        } else if (selectedOption == 4) { // View ADT
+                            viewADT(currentADT, heap, bst, avl, btree, rbt, stack, queue, priorityQueue);
+                        } else if (selectedOption == 5) { // Import from file
                             std::string fileName = browseFile();
                             std::cout << "Importing from file: " << fileName << "\n";
                             if (currentADT == ADTType::AVL) avl.parseFromFile(fileName);
@@ -153,8 +190,12 @@ int main() {
                         operationMenu.moveDown();
                     } else if (event.key.code == sf::Keyboard::Enter) {
                         int operation = operationMenu.getSelectedItemIndex();
-                        inputMode = true;
-                        std::cout << (operation == 0 ? "Insert" : operation == 1 ? "Delete" : "Search") << " value: ";
+                        if (operation == 3) { // View ADT
+                            viewADT(currentADT, heap, bst, avl, btree, rbt, stack, queue, priorityQueue);
+                        } else {
+                            inputMode = true;
+                            std::cout << (operation == 0 ? "Insert" : operation == 1 ? "Delete" : "Search") << " value: ";
+                        }
                     }
                     break;
                 }
@@ -167,16 +208,28 @@ int main() {
                         if (operationMenu.getSelectedItemIndex() == 0) { // Insert
                             if (currentADT == ADTType::HEAP) heap.insert(value);
                             else if (currentADT == ADTType::BST) bst.insert(value);
-                            // Repeat for other ADTs
+                            else if (currentADT == ADTType::AVL) avl.insert(value);
+                            else if (currentADT == ADTType::BTREE) btree.insert(value);
+                            else if (currentADT == ADTType::RED_BLACK_TREE) rbt.insert(value);
+                            else if (currentADT == ADTType::STACK) stack.push(value);
+                            else if (currentADT == ADTType::QUEUE) queue.enqueue(value);
+                            else if (currentADT == ADTType::PRIORITY_QUEUE) priorityQueue.enqueue(value);
                         } else if (operationMenu.getSelectedItemIndex() == 1) { // Delete
                             if (currentADT == ADTType::HEAP) heap.deleteValue(value);
                             else if (currentADT == ADTType::BST) bst.deleteValue(value);
-                            // Repeat for other ADTs
+                            else if (currentADT == ADTType::AVL) avl.deleteValue(value);
+                            else if (currentADT == ADTType::BTREE) btree.deleteValue(value);
+                            else if (currentADT == ADTType::RED_BLACK_TREE) rbt.deleteValue(value);
+                            else if (currentADT == ADTType::STACK) stack.pop();
+                            else if (currentADT == ADTType::QUEUE) queue.dequeue();
+                            else if (currentADT == ADTType::PRIORITY_QUEUE) priorityQueue.dequeue();
                         } else if (operationMenu.getSelectedItemIndex() == 2) { // Search
                             bool found = false;
                             if (currentADT == ADTType::HEAP) found = heap.search(value);
                             else if (currentADT == ADTType::BST) found = bst.search(value);
-                            // Repeat for other ADTs
+                            else if (currentADT == ADTType::AVL) found = avl.search(value);
+                            else if (currentADT == ADTType::BTREE) found = btree.search(value);
+                            else if (currentADT == ADTType::RED_BLACK_TREE) found = rbt.search(value);
                             std::cout << (found ? "Found" : "Not found") << "\n";
                         }
                     } catch (const std::exception& e) {
@@ -214,4 +267,5 @@ int main() {
 
     return 0;
 }
+
 

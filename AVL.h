@@ -28,10 +28,10 @@ public:
     bool search(int key) const;
     void parseFromFile(const std::string& fileName);
     void draw(sf::RenderWindow& window);
-    void drawNode(sf::RenderWindow& window, AVLNode* node, float x,float y, float offset);
     void display() const;
 
     // New Methods
+    void print() const; // Print method
     int getDepth(int key) const;
     int getOrder(int key) const;
 
@@ -53,6 +53,8 @@ private:
     // Helper functions for new methods
     int calculateDepth(AVLNode* node, int key, int depth) const;
     int calculateOrder(AVLNode* node, int key, int& order) const;
+
+    void printInOrder(AVLNode* node) const; // Helper for the print method
 };
 
 #endif // AVL_H

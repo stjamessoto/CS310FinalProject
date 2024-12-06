@@ -15,8 +15,9 @@ public:
     void pop();             // Remove the top element
     int top() const;        // Get the top element
     bool isEmpty() const;   // Check if the stack is empty
-    void display() const;   // Display the stack
-    void draw(sf::RenderWindow& window);
+    void display() const;   // Display the stack (using SFML rendering)
+    void draw(sf::RenderWindow& window);  // SFML specific draw function
+    void print() const;     // Print the stack contents to the console
 };
 
 #endif // STACK_H

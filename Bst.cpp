@@ -1,4 +1,5 @@
 #include "Bst.h"
+#include "Bst.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -152,4 +153,29 @@ void BST::drawNode(sf::RenderWindow& window, Node* node, float x, float y, float
 // Public function to draw the entire tree
 void BST::draw(sf::RenderWindow& window) {
     drawNode(window, root, window.getSize().x / 2, 50, 200);
+}
+
+// New print function
+void BST::print() const {
+    std::cout << "Binary Search Tree (rotated 90 degrees):\n";
+    printTree(root, 0);
+}
+
+// Helper function for print
+void BST::printTree(Node* node, int space, int indent) const {
+    if (node == nullptr) return;
+
+    // Increase distance between levels
+    space += indent;
+
+    // Print right child first
+    printTree(node->right, space, indent);
+
+    // Print current node after spacing
+    std::cout << std::endl;
+    for (int i = indent; i < space; i++) std::cout << " ";
+    std::cout << node->value << "\n";
+
+    // Print left child
+    printTree(node->left, space, indent);
 }

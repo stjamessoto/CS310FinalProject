@@ -48,6 +48,7 @@ public:
     bool search(int key);
     void deleteValue(int key);
     void display();
+    void print(); // New function to print the tree
     void parseFromFile(const std::string& filename);
     void draw(sf::RenderWindow& window);
 };
