@@ -4,6 +4,7 @@
 
 #include <deque>
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 class Queue {
 private:
@@ -15,6 +16,7 @@ public:
     int front() const;       // Get the front element
     bool isEmpty() const;    // Check if the queue is empty
     void display() const;    // Display the queue
+    void draw(sf::RenderWindow& window);
 };
 
 #endif // QUEUE_H

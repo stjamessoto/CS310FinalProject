@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
+#include <SFML/Graphics.hpp>
 
 struct AVLNode {
     int key;
@@ -26,6 +27,8 @@ public:
     void deleteValue(int key);
     bool search(int key) const;
     void parseFromFile(const std::string& fileName);
+    void draw(sf::RenderWindow& window);
+    void drawNode(sf::RenderWindow& window, AVLNode* node, float x,float y, float offset);
     void display() const;
 
     // New Methods

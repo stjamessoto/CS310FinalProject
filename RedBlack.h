@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <SFML/Graphics.hpp>
 
 enum Color { RED, BLACK };
 
@@ -48,6 +49,7 @@ public:
     void deleteValue(int key);
     void display();
     void parseFromFile(const std::string& filename);
+    void draw(sf::RenderWindow& window);
 };
 
 #endif // REDBLACK_H

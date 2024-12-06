@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
+#include <SFML/Graphics.hpp>
 
 // Priority Queue class using a min-heap
 class PriorityQueue {
@@ -22,6 +23,7 @@ public:
     std::pair<int, int> peek() const;
     bool isEmpty() const;
     void display() const;
+    void draw(sf::RenderWindow& window);
 
     // File parsing
     void parseFromFile(const std::string& fileName);

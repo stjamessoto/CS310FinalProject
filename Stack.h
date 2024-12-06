@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 class Stack {
 private:
@@ -15,6 +16,7 @@ public:
     int top() const;        // Get the top element
     bool isEmpty() const;   // Check if the stack is empty
     void display() const;   // Display the stack
+    void draw(sf::RenderWindow& window);
 };
 
 #endif // STACK_H

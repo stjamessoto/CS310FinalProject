@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <queue>
+#include <SFML/Graphics.hpp>
 
 class BST {
 private:
@@ -37,6 +38,7 @@ public:
     bool search(int value);
     void displayTree() const;
     void parseFromFile(const std::string& fileName);
+    void draw(sf::RenderWindow& window);
 };
 
 #endif

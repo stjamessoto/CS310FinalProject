@@ -7,6 +7,7 @@
 #include <queue>
 #include <fstream>
 #include <sstream>
+#include <SFML/Graphics.hpp>
 
 class BTreeNode {
 public:
@@ -28,6 +29,9 @@ private:
     BTreeNode* root;
     int t; // Minimum degree
 
+    // Helper function for drawing nodes recursively
+    void drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y, float offset);
+
 public:
     BTree(int t);
     void traverse();
@@ -35,6 +39,7 @@ public:
     void insert(int key);
     void display();
     void parseFromFile(const std::string& filename);
+    void draw(sf::RenderWindow& window);
 };
 
 #endif

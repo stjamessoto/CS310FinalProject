@@ -1,24 +1,30 @@
 //BTree.cpp
 #include "BTree.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <SFML/Graphics.hpp>
 
-// BTreeNode constructor
-BTreeNode::BTreeNode(int t, bool isLeaf) : t(t), isLeaf(isLeaf) {}
+// BTreeNode Constructor
+BTreeNode::BTreeNode(int t, bool isLeaf) {
+    this->t = t;
+    this->isLeaf = isLeaf;
+}
 
-// Traverse the tree
+// Traverse the BTreeNode
 void BTreeNode::traverse() {
-    int i;
-    for (i = 0; i < keys.size(); i++) {
+    for (size_t i = 0; i < keys.size(); ++i) {
         if (!isLeaf) {
             children[i]->traverse();
         }
         std::cout << keys[i] << " ";
     }
     if (!isLeaf) {
-        children[i]->traverse();
+        children[keys.size()]->traverse();
     }
 }
 
-// Search for a key
+// Search a key in this node
 bool BTreeNode::search(int key) {
     int i = 0;
     while (i < keys.size() && key > keys[i]) {
@@ -33,25 +39,26 @@ bool BTreeNode::search(int key) {
     return children[i]->search(key);
 }
 
-// Insert into a non-full node
+// Insert key into non-full node
 void BTreeNode::insertNonFull(int key) {
     int i = keys.size() - 1;
-
     if (isLeaf) {
-        keys.push_back(0); // Allocate space
+        // Find the correct position for the new key
         while (i >= 0 && keys[i] > key) {
-            keys[i + 1] = keys[i];
             i--;
         }
-        keys[i + 1] = key;
+        keys.insert(keys.begin() + i + 1, key);
     } else {
+        // Find the child to insert into
         while (i >= 0 && keys[i] > key) {
             i--;
         }
         i++;
+
+        // If the child is full, split it
         if (children[i]->keys.size() == 2 * t - 1) {
             splitChild(i, children[i]);
-            if (keys[i] < key) {
+            if (key > keys[i]) {
                 i++;
             }
         }
@@ -59,76 +66,108 @@ void BTreeNode::insertNonFull(int key) {
     }
 }
 
-// Split a child node
+// Split the child node
 void BTreeNode::splitChild(int i, BTreeNode* y) {
     BTreeNode* z = new BTreeNode(y->t, y->isLeaf);
-    z->keys.resize(t - 1);
-
-    for (int j = 0; j < t - 1; j++) {
-        z->keys[j] = y->keys[j + t];
-    }
-    if (!y->isLeaf) {
-        z->children.resize(t);
-        for (int j = 0; j < t; j++) {
-            z->children[j] = y->children[j + t];
-        }
-    }
+    z->keys = std::vector<int>(y->keys.begin() + t, y->keys.end());
     y->keys.resize(t - 1);
+
+    if (!y->isLeaf) {
+        z->children = std::vector<BTreeNode*>(y->children.begin() + t, y->children.end());
+        y->children.resize(t);
+    }
+
     children.insert(children.begin() + i + 1, z);
     keys.insert(keys.begin() + i, y->keys[t - 1]);
 }
 
-// BTree constructor
-BTree::BTree(int t) : root(nullptr), t(t) {}
+// BTree Constructor
+BTree::BTree(int t) {
+    this->t = t;
+    root = new BTreeNode(t, true);
+}
 
 // Traverse the tree
 void BTree::traverse() {
-    if (root) {
+    if (root != nullptr) {
         root->traverse();
     }
+}
+
+// Search for a key in the BTree
+bool BTree::search(int key) {
+    return root->search(key);
+}
+
+// Insert a key into the BTree
+void BTree::insert(int key) {
+    if (root->keys.size() == 2 * t - 1) {
+        BTreeNode* s = new BTreeNode(t, false);
+        s->children.push_back(root);
+        s->splitChild(0, root);
+
+        int i = 0;
+        if (s->keys[0] < key) {
+            i++;
+        }
+        s->children[i]->insertNonFull(key);
+        root = s;
+    } else {
+        root->insertNonFull(key);
+    }
+}
+
+// Display the tree (in-order traversal)
+void BTree::display() {
+    traverse();
     std::cout << std::endl;
 }
 
-// Search for a key
-bool BTree::search(int key) {
-    return root ? root->search(key) : false;
-}
-
-// Insert a key
-void BTree::insert(int key) {
-    if (!root) {
-        root = new BTreeNode(t, true);
-        root->keys.push_back(key);
-    } else {
-        if (root->keys.size() == 2 * t - 1) {
-            BTreeNode* s = new BTreeNode(t, false);
-            s->children.push_back(root);
-            s->splitChild(0, root);
-            int i = (s->keys[0] < key) ? 1 : 0;
-            s->children[i]->insertNonFull(key);
-            root = s;
-        } else {
-            root->insertNonFull(key);
-        }
-    }
-}
-
-// Display the tree
-void BTree::display() {
-    std::cout << "BTree contents: ";
-    traverse();
-}
-
-// Parse values from a file
+// Parse data from a file and insert into the BTree
 void BTree::parseFromFile(const std::string& filename) {
     std::ifstream file(filename);
-    if (!file) {
-        std::cerr << "Failed to open file: " << filename << "\n";
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
         return;
     }
-    int value;
-    while (file >> value) {
-        insert(value);
+    int key;
+    while (file >> key) {
+        insert(key);
     }
-    std::cout << "File imported successfully into BTree.\n";
+    file.close();
 }
+
+// Helper function to draw the BTreeNode
+void BTree::drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y, float offset) {
+    if (!node) return;
+
+    // Draw the node (keys)
+    sf::CircleShape nodeShape(30);
+    nodeShape.setFillColor(sf::Color::Green);
+    nodeShape.setPosition(x, y);
+    window.draw(nodeShape);
+
+    sf::Text text;
+    text.setFont(sf::Font());
+    text.setString(std::to_string(node->keys[0]));
+    text.setCharacterSize(20);
+    text.setFillColor(sf::Color::Black);
+    text.setPosition(x + 10, y + 10);
+    window.draw(text);
+
+    // Recursively draw children nodes
+    float childOffset = offset / 2;
+    for (size_t i = 0; i < node->children.size(); ++i) {
+        float childX = x + (i - (node->children.size() / 2)) * 100;
+        float childY = y + 80;
+        drawNode(window, node->children[i], childX, childY, childOffset);
+    }
+}
+
+// Draw the BTree using SFML
+void BTree::draw(sf::RenderWindow& window) {
+    if (root != nullptr) {
+        drawNode(window, root, 400, 50, 200);
+    }
+}
+
