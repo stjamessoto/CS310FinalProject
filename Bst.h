@@ -7,10 +7,11 @@
 #include <sstream>
 #include <string>
 #include <queue>
+#include <vector>  
 #include <SFML/Graphics.hpp>
 
 class BST {
-protected: // Changed from `private` to allow access to `Node` from `bst.cpp`
+protected:
     struct Node {
         int value;
         Node* left;
@@ -25,7 +26,8 @@ protected: // Changed from `private` to allow access to `Node` from `bst.cpp`
     Node* deleteNode(Node* node, int value);
     Node* findMin(Node* node);
     bool searchNode(Node* node, int value);
-    void inorderTraversal(Node* node, std::ostream& os) const;
+    void inorderTraversal(Node* node, std::ostream& os) const;  // Existing for printing to ostream
+    void inorderTraversal(Node* node, std::vector<int>& data) const;  // New helper for filling vector
     void clearTree(Node* node);
     void printTree(Node* node, int space, int indent = 4) const; // Helper for print()
     void drawNode(sf::RenderWindow& window, Node* node, float x, float y, float offset) const; // Helper for draw()
@@ -42,9 +44,12 @@ public:
     void parseFromFile(const std::string& fileName);
     void draw(sf::RenderWindow& window);
 
-    // New function
+    Node* getRoot() const;  // Get the root node
+
+    // Function to get data from the tree in the form of a vector
+    std::vector<int> getData() const;   // New function to return data as a vector
+
     void print() const;
 };
 
 #endif
-

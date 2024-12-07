@@ -1,4 +1,4 @@
-//heap.h
+// heap.h
 #ifndef HEAP_H
 #define HEAP_H
 
@@ -20,11 +20,15 @@ public:
     void deleteValue(int value); // Delete a specific value from the heap
     bool search(int value);      // Search for a value in the heap
     void parseFromFile(const std::string& fileName); // Populate heap from a file
+    void buildHeap(const std::vector<int>& data);  // Build the heap from a given data array
     void displayHeap();          // Display the heap contents
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window, const sf::Font& font);  // Draw the heap visually
 
     // Print the current heap state to the console
     void print() const;
+
+    // Getter method to access heap data (only declare, no definition here)
+    std::vector<int> getData() const;
 };
 
 #endif

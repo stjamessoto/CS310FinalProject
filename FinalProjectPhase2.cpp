@@ -1,5 +1,11 @@
-// Tasks: Replace the placeholder menu options with: ADT selection, operations: Insert, Delete， Search. Import values from a file. Add fuctionality to capture and display values in real-time. Allows users to browse and select a file. Parse the file and  populate the selected adt.
-// Describe each step. Include test cases and how to run the applicaton.
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <thread>
+#include <atomic>
+#include <filesystem>
 #include "heap.h"
 #include "Bst.h"
 #include "Stack.h"
@@ -8,41 +14,27 @@
 #include "AVL.h"
 #include "BTree.h"
 #include "RedBlack.h"
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <filesystem>
 
-// Enum for ADT types
+// Enums for ADT and Application State
 enum class ADTType { HEAP, BST, AVL, BTREE, STACK, QUEUE, PRIORITY_QUEUE, RED_BLACK_TREE };
+enum class AppState { MAIN_MENU, ADT_SELECTION, ADT_OPERATIONS, VIEW_ADT };
 
-// Application State Enum
-enum class AppState { MAIN_MENU, ADT_SELECTION, ADT_OPERATIONS };
-
-// Simple Menu class
+// Menu class for navigation
 class Menu {
 private:
     int selectedItemIndex;
-    sf::Font font;
     std::vector<sf::Text> menuItems;
 
 public:
-    Menu(float width, float height, const std::vector<std::string>& options) {
-        if (!font.loadFromFile("edosz.ttf")) {
-            std::cerr << "Failed to load font!\n";
-        }
-
+    Menu(float width, float height, const std::vector<std::string>& options, const sf::Font& font) {
         for (size_t i = 0; i < options.size(); ++i) {
             sf::Text text;
             text.setFont(font);
             text.setString(options[i]);
             text.setFillColor(i == 0 ? sf::Color::Red : sf::Color::White);
-            text.setPosition(sf::Vector2f(width / 2 - 50, height / (options.size() + 1) * (i + 1)));
+            text.setPosition(sf::Vector2f(width / 2 - 100, height / (options.size() + 1) * (i + 1)));
             menuItems.push_back(text);
         }
-
         selectedItemIndex = 0;
     }
 
@@ -73,69 +65,99 @@ public:
     }
 };
 
-// Function to view the current state of the ADT
-void viewADT(ADTType currentADT, Heap& heap, BST& bst, AVL& avl, BTree& btree, RedBlackTree& rbt,
-             Stack& stack, Queue& queue, PriorityQueue& priorityQueue) {
-    std::cout << "Viewing the current ADT state:\n";
+// Load data from file asynchronously and insert into heap, stack, queue, and btree
+void loadDataFromFile(const std::string& filename, std::vector<int>& data, std::atomic<bool>& done, 
+                      Heap& heap, Stack& stack, Queue& queue, BTree& btree) {
+    std::ifstream file(filename);
+    std::string line;
 
-    switch (currentADT) {
-    case ADTType::HEAP:
-        heap.print(); // Assume `print` function exists for Heap
-        break;
-    case ADTType::BST:
-        bst.print(); // Assume `print` function exists for BST
-        break;
-    case ADTType::AVL:
-        avl.print(); // Assume `print` function exists for AVL
-        break;
-    case ADTType::BTREE:
-        btree.print(); // Assume `print` function exists for BTree
-        break;
-    case ADTType::RED_BLACK_TREE:
-        rbt.print(); // Assume `print` function exists for Red-Black Tree
-        break;
-    case ADTType::STACK:
-        stack.print(); // Assume `print` function exists for Stack
-        break;
-    case ADTType::QUEUE:
-        queue.print(); // Assume `print` function exists for Queue
-        break;
-    case ADTType::PRIORITY_QUEUE:
-        priorityQueue.print(); // Assume `print` function exists for Priority Queue
-        break;
-    default:
-        std::cerr << "No ADT selected or viewing not supported.\n";
+    data.clear();
+    while (std::getline(file, line)) {
+        try {
+            int value = std::stoi(line);  // Convert the line to an integer
+            data.push_back(value);        // Add it to the data vector
+            heap.insert(value);           // Insert it directly into the heap
+            stack.push(value);            // Insert the value into the stack
+            queue.enqueue(value);         // Insert the value into the queue
+            btree.insert(value);          // Insert the value into the BTree
+            std::cout << "Inserted value: " << value << " into the heap, stack, queue, and btree." << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "Error reading value from file: " << e.what() << "\n";
+        }
     }
+    done = true;
+    std::cout << "File loaded and data inserted into the heap, stack, queue, and btree." << std::endl;
 }
 
 std::string browseFile() {
-    std::cout << "Simulating file selection... (default: sample.txt)\n";
-    return "sample.txt";
+    return "sample.txt"; // Here you would add logic to browse and choose a file
 }
 
+// View and display the current ADT state
+void viewADT(ADTType currentADT, Heap& heap, BST& bst, AVL& avl, BTree& btree, RedBlackTree& rbt,
+             Stack& stack, Queue& queue, PriorityQueue& priorityQueue,
+             const std::vector<int>& data, sf::RenderWindow& window, const sf::Font& font) {
+    window.clear();
+
+    sf::Text title("Viewing ADT", font, 30);
+    title.setPosition(100, 20);
+    title.setFillColor(sf::Color::White);
+    window.draw(title);
+
+    // Call the draw method from the selected ADT class
+    switch (currentADT) {
+        case ADTType::HEAP:
+            heap.draw(window, font);  // Draw the heap structure
+            break;
+        case ADTType::STACK:
+            stack.draw(window, font);  // Draw the stack structure
+            break;
+        case ADTType::QUEUE:
+            queue.draw(window, font);  // Draw the queue structure
+            break;
+        case ADTType::BTREE:
+            btree.draw(window, font);  // Draw the BTree structure (assuming BTree has a draw method)
+            break;
+        // Add cases for other ADTs here if needed
+    }
+
+    sf::Text backText("Press Backspace to return", font, 20);
+    backText.setPosition(100, window.getSize().y - 50);
+    backText.setFillColor(sf::Color::Yellow);
+    window.draw(backText);
+
+    window.display();
+}
+
+// Main Function
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Menu with ADTs");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ADT Menu");
+
+    sf::Font font;
+    if (!font.loadFromFile("edosz.ttf")) {
+        std::cerr << "Failed to load font!\n";
+        return -1;
+    }
+
     AppState appState = AppState::MAIN_MENU;
+    Menu mainMenu(window.getSize().x, window.getSize().y, {"Select ADT", "Insert", "Delete", "Search", "View ADT", "Import from File"}, font);
+    Menu adtMenu(window.getSize().x, window.getSize().y, {"Heap", "BST", "AVL", "BTree", "Stack", "Queue", "Priority Queue", "Red-Black Tree"}, font);
+    Menu operationMenu(window.getSize().x, window.getSize().y, {"Insert", "Delete", "Search", "View"}, font);
 
-    Menu mainMenu(window.getSize().x, window.getSize().y, {"Select ADT", "Insert", "Delete", "Search", "View ADT", "Import from File"});
-    Menu adtMenu(window.getSize().x, window.getSize().y, {"Heap", "BST", "AVL", "BTree", "Stack", "Queue", "Priority Queue", "Red-Black Tree"});
-    Menu operationMenu(window.getSize().x, window.getSize().y, {"Insert", "Delete", "Search", "View"});
+    ADTType currentADT = ADTType::HEAP;
 
-    ADTType currentADT = ADTType::HEAP; // Default ADT
-
-    // ADT Instances
     Heap heap;
     BST bst;
     AVL avl;
-    BTree btree(3);
+    BTree btree(3);  // Create a BTree with a degree of 3
     RedBlackTree rbt;
     Stack stack;
     Queue queue;
     PriorityQueue priorityQueue;
 
-    bool inputMode = false;
-    std::string inputBuffer;
-    int selectedOption = -1;
+    std::vector<int> data;
+    std::atomic<bool> done(false);
+    std::thread fileThread;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -147,125 +169,57 @@ int main() {
             if (event.type == sf::Event::KeyPressed) {
                 switch (appState) {
                 case AppState::MAIN_MENU:
-                    if (event.key.code == sf::Keyboard::Up) {
-                        mainMenu.moveUp();
-                    } else if (event.key.code == sf::Keyboard::Down) {
-                        mainMenu.moveDown();
-                    } else if (event.key.code == sf::Keyboard::Enter) {
-                        selectedOption = mainMenu.getSelectedItemIndex();
-                        if (selectedOption == 0) { // Go to ADT selection
-                            appState = AppState::ADT_SELECTION;
-                        } else if (selectedOption == 4) { // View ADT
-                            viewADT(currentADT, heap, bst, avl, btree, rbt, stack, queue, priorityQueue);
-                        } else if (selectedOption == 5) { // Import from file
+                    if (event.key.code == sf::Keyboard::Up) mainMenu.moveUp();
+                    if (event.key.code == sf::Keyboard::Down) mainMenu.moveDown();
+                    if (event.key.code == sf::Keyboard::Enter) {
+                        int selectedOption = mainMenu.getSelectedItemIndex();
+                        if (selectedOption == 0) appState = AppState::ADT_SELECTION;
+                        else if (selectedOption == 4) appState = AppState::VIEW_ADT;
+                        else if (selectedOption == 5) {  // When selecting "Import from File"
                             std::string fileName = browseFile();
-                            std::cout << "Importing from file: " << fileName << "\n";
-                            if (currentADT == ADTType::AVL) avl.parseFromFile(fileName);
-                            else if (currentADT == ADTType::HEAP) heap.parseFromFile(fileName);
-                            else if (currentADT == ADTType::BST) bst.parseFromFile(fileName);
-                            else if (currentADT == ADTType::BTREE) btree.parseFromFile(fileName);
-                            else if (currentADT == ADTType::RED_BLACK_TREE) rbt.parseFromFile(fileName);
-                            else if (currentADT == ADTType::PRIORITY_QUEUE) priorityQueue.parseFromFile(fileName);
-                            else std::cerr << "File import not supported for Stack/Queue.\n";
+                            done = false;
+                            fileThread = std::thread(loadDataFromFile, fileName, std::ref(data), std::ref(done), 
+                                                     std::ref(heap), std::ref(stack), std::ref(queue), std::ref(btree)); // Load and insert into heap, stack, queue, and btree
                         }
                     }
                     break;
 
                 case AppState::ADT_SELECTION:
-                    if (event.key.code == sf::Keyboard::Up) {
-                        adtMenu.moveUp();
-                    } else if (event.key.code == sf::Keyboard::Down) {
-                        adtMenu.moveDown();
-                    } else if (event.key.code == sf::Keyboard::Enter) {
+                    if (event.key.code == sf::Keyboard::Up) adtMenu.moveUp();
+                    if (event.key.code == sf::Keyboard::Down) adtMenu.moveDown();
+                    if (event.key.code == sf::Keyboard::Enter) {
                         currentADT = static_cast<ADTType>(adtMenu.getSelectedItemIndex());
                         appState = AppState::ADT_OPERATIONS;
-                        std::cout << "ADT selected.\n";
                     }
                     break;
 
                 case AppState::ADT_OPERATIONS:
-                    if (event.key.code == sf::Keyboard::Up) {
-                        operationMenu.moveUp();
-                    } else if (event.key.code == sf::Keyboard::Down) {
-                        operationMenu.moveDown();
-                    } else if (event.key.code == sf::Keyboard::Enter) {
-                        int operation = operationMenu.getSelectedItemIndex();
-                        if (operation == 3) { // View ADT
-                            viewADT(currentADT, heap, bst, avl, btree, rbt, stack, queue, priorityQueue);
-                        } else {
-                            inputMode = true;
-                            std::cout << (operation == 0 ? "Insert" : operation == 1 ? "Delete" : "Search") << " value: ";
-                        }
+                    if (event.key.code == sf::Keyboard::Up) operationMenu.moveUp();
+                    if (event.key.code == sf::Keyboard::Down) operationMenu.moveDown();
+                    if (event.key.code == sf::Keyboard::Enter) {
+                        int option = operationMenu.getSelectedItemIndex();
+                        if (option == 3) appState = AppState::VIEW_ADT;
                     }
+                    break;
+
+                case AppState::VIEW_ADT:
+                    if (event.key.code == sf::Keyboard::BackSpace) appState = AppState::MAIN_MENU;
                     break;
                 }
             }
-
-            if (inputMode && event.type == sf::Event::TextEntered) {
-                if (event.text.unicode == '\r') { // Enter
-                    try {
-                        int value = std::stoi(inputBuffer);
-                        if (operationMenu.getSelectedItemIndex() == 0) { // Insert
-                            if (currentADT == ADTType::HEAP) heap.insert(value);
-                            else if (currentADT == ADTType::BST) bst.insert(value);
-                            else if (currentADT == ADTType::AVL) avl.insert(value);
-                            else if (currentADT == ADTType::BTREE) btree.insert(value);
-                            else if (currentADT == ADTType::RED_BLACK_TREE) rbt.insert(value);
-                            else if (currentADT == ADTType::STACK) stack.push(value);
-                            else if (currentADT == ADTType::QUEUE) queue.enqueue(value);
-                            else if (currentADT == ADTType::PRIORITY_QUEUE) priorityQueue.enqueue(value, priority);
-                        } else if (operationMenu.getSelectedItemIndex() == 1) { // Delete
-                            if (currentADT == ADTType::HEAP) heap.deleteValue(value);
-                            else if (currentADT == ADTType::BST) bst.deleteValue(value);
-                            else if (currentADT == ADTType::AVL) avl.deleteValue(value);
-                            else if (currentADT == ADTType::BTREE) btree.deleteValue(value);
-                            else if (currentADT == ADTType::RED_BLACK_TREE) rbt.deleteValue(value);
-                            else if (currentADT == ADTType::STACK) stack.pop();
-                            else if (currentADT == ADTType::QUEUE) queue.dequeue();
-                            else if (currentADT == ADTType::PRIORITY_QUEUE) priorityQueue.dequeue();
-                        } else if (operationMenu.getSelectedItemIndex() == 2) { // Search
-                            bool found = false;
-                            if (currentADT == ADTType::HEAP) found = heap.search(value);
-                            else if (currentADT == ADTType::BST) found = bst.search(value);
-                            else if (currentADT == ADTType::AVL) found = avl.search(value);
-                            else if (currentADT == ADTType::BTREE) found = btree.search(value);
-                            else if (currentADT == ADTType::RED_BLACK_TREE) found = rbt.search(value);
-                            std::cout << (found ? "Found" : "Not found") << "\n";
-                        }
-                    } catch (const std::exception& e) {
-                        std::cerr << "Invalid input: " << e.what() << "\n";
-                    }
-
-                    inputMode = false;
-                    inputBuffer.clear();
-                } else if (event.text.unicode == 8 && !inputBuffer.empty()) { // Backspace
-                    inputBuffer.pop_back();
-                } else if (event.text.unicode < 128) { // Valid ASCII
-                    inputBuffer += static_cast<char>(event.text.unicode);
-                }
-            }
         }
+
+        if (fileThread.joinable() && done) fileThread.join();  // Wait until file loading and insertion is done
 
         window.clear();
-
         switch (appState) {
-        case AppState::MAIN_MENU:
-            mainMenu.draw(window);
-            break;
-
-        case AppState::ADT_SELECTION:
-            adtMenu.draw(window);
-            break;
-
-        case AppState::ADT_OPERATIONS:
-            operationMenu.draw(window);
-            break;
+        case AppState::MAIN_MENU: mainMenu.draw(window); break;
+        case AppState::ADT_SELECTION: adtMenu.draw(window); break;
+        case AppState::ADT_OPERATIONS: operationMenu.draw(window); break;
+        case AppState::VIEW_ADT: viewADT(currentADT, heap, bst, avl, btree, rbt, stack, queue, priorityQueue, data, window, font); break;
         }
-
         window.display();
     }
 
     return 0;
 }
-
-

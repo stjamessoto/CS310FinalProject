@@ -1,9 +1,8 @@
-//Queue.h
 #ifndef QUEUE_H
 #define QUEUE_H
 
 #include <deque>
-#include <iostream>
+#include <vector>
 #include <SFML/Graphics.hpp>
 
 class Queue {
@@ -11,25 +10,29 @@ private:
     std::deque<int> queue;
 
 public:
-    void enqueue(int value); // Add an element to the queue
-    void dequeue();          // Remove an element from the front
-    int front() const;       // Get the front element
-    bool isEmpty() const;    // Check if the queue is empty
-    void display() const;    // Display the queue
-    void draw(sf::RenderWindow& window);
+    // Add an element to the queue
+    void enqueue(int value);
 
-    // New function to print the queue elements
-    void print() const {
-        std::cout << "Queue: ";
-        if (queue.empty()) {
-            std::cout << "Empty\n";
-        } else {
-            for (const int& value : queue) {
-                std::cout << value << " ";
-            }
-            std::cout << "\n";
-        }
-    }
+    // Remove an element from the front of the queue
+    void dequeue();
+
+    // Get the front element of the queue
+    int front() const;
+
+    // Check if the queue is empty
+    bool isEmpty() const;
+
+    // Display the queue in the console (as a simple text output)
+    void display() const;
+
+    // Draw the queue visually on the screen using SFML
+    void draw(sf::RenderWindow& window, const sf::Font& font);
+
+    // Print the queue elements in the console
+    void print() const;
+
+    // Return the queue elements as a vector
+    std::vector<int> getElements() const;
 };
 
 #endif // QUEUE_H

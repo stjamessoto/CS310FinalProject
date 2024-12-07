@@ -72,6 +72,16 @@ void Heap::parseFromFile(const std::string& fileName) {
     file.close();
 }
 
+// Build the heap from a given data array
+void Heap::buildHeap(const std::vector<int>& data) {
+    heap = data; // Copy the data into the heap
+
+    // Perform heapifyDown starting from the last non-leaf node
+    for (int i = heap.size() / 2 - 1; i >= 0; --i) {
+        heapifyDown(i);
+    }
+}
+
 // Display the heap contents
 void Heap::displayHeap() {
     for (int value : heap) {
@@ -81,7 +91,7 @@ void Heap::displayHeap() {
 }
 
 // Function to visualize the heap using SFML
-void Heap::draw(sf::RenderWindow& window) {
+void Heap::draw(sf::RenderWindow& window, const sf::Font& font) {
     if (heap.empty()) return;
 
     // Set up parameters for the visualization
@@ -94,17 +104,20 @@ void Heap::draw(sf::RenderWindow& window) {
         float x = xOffset + (i % 2) * offset;
         float y = yOffset + (i / 2) * 50;
 
-        // Draw the node
+        // Draw the node (circle)
         sf::CircleShape circle(30);  // Create a circle with radius 30
         circle.setFillColor(sf::Color::Green);
         circle.setPosition(x, y);
 
+        // Create the text for the number inside the circle
         sf::Text text;
         text.setString(std::to_string(heap[i]));
         text.setFillColor(sf::Color::White);
         text.setCharacterSize(24);
+        text.setFont(font);
         text.setPosition(x + 10, y + 5); // Adjust position for text inside the circle
 
+        // Draw the circle and the number
         window.draw(circle);
         window.draw(text);
 
@@ -137,3 +150,9 @@ void Heap::print() const {
     }
     std::cout << std::endl;
 }
+
+// Get the current heap data
+std::vector<int> Heap::getData() const {
+    return heap;
+}
+

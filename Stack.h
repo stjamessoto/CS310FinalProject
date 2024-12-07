@@ -11,13 +11,29 @@ private:
     std::vector<int> stack;
 
 public:
-    void push(int value);   // Add an element to the stack
-    void pop();             // Remove the top element
-    int top() const;        // Get the top element
-    bool isEmpty() const;   // Check if the stack is empty
-    void display() const;   // Display the stack (using SFML rendering)
-    void draw(sf::RenderWindow& window);  // SFML specific draw function
-    void print() const;     // Print the stack contents to the console
+    // Add an element to the stack
+    void push(int value);
+
+    // Remove the top element
+    void pop();
+
+    // Get the top element
+    int top() const;
+
+    // Check if the stack is empty
+    bool isEmpty() const;
+
+    // Display the stack (using SFML rendering)
+    void display() const;
+
+    // SFML-specific draw function, added font parameter
+    void draw(sf::RenderWindow& window, const sf::Font& font);
+
+    // Print the stack contents to the console
+    void print() const;
+
+    // Return all elements of the stack
+    std::vector<int> getElements() const;
 };
 
 #endif // STACK_H

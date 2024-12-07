@@ -162,3 +162,27 @@ void PriorityQueue::parseFromFile(const std::string& filename) {
     // Inform the user that the file has been parsed successfully
     std::cout << "File parsed successfully: " << filename << std::endl;
 }
+
+// Get the internal data of the heap
+std::vector<std::pair<int, int>> PriorityQueue::getData() const {
+    return heap;
+}
+
+// Extract values from the pairs and return as a vector of ints
+std::vector<int> PriorityQueue::getValues() const {
+    std::vector<int> values;
+    for (const auto& item : heap) {
+        values.push_back(item.second);  // 'second' is the value part of the pair
+    }
+    return values;
+}
+
+// Extract priorities from the pairs and return as a vector of ints
+std::vector<int> PriorityQueue::getPriorities() const {
+    std::vector<int> priorities;
+    for (const auto& item : heap) {
+        priorities.push_back(item.first);  // 'first' is the priority part of the pair
+    }
+    return priorities;
+}
+

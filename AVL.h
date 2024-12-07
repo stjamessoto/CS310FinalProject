@@ -1,3 +1,4 @@
+//AVL.h
 #ifndef AVL_H
 #define AVL_H
 
@@ -33,6 +34,7 @@ public:
     void print() const; // Print method
     int getDepth(int key) const;
     int getOrder(int key) const;
+    std::vector<int> getData() const;  // Ensure this returns a vector of int
 
 private:
     AVLNode* root;
@@ -46,7 +48,7 @@ private:
     AVLNode* rotateRight(AVLNode* y);
     AVLNode* rotateLeft(AVLNode* x);
 
-    void inOrderTraversal(AVLNode* node) const;
+    void inOrderTraversal(AVLNode* node, std::vector<int>& keys) const;  // Updated to take a vector of keys
     void clear(AVLNode* node);
 
     // Helper functions for new methods

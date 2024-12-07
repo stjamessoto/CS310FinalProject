@@ -1,9 +1,10 @@
-#include "Bst.h"
+//Bst.cpp
 #include "Bst.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 BST::BST() : root(nullptr) {}
 
@@ -82,12 +83,12 @@ bool BST::searchNode(Node* node, int value) {
 void BST::inorderTraversal(Node* node, std::ostream& os) const {
     if (node == nullptr) return;
     inorderTraversal(node->left, os);
-    os << node->value << " ";
+    os << node->value << " ";  // Write the node value to the output stream
     inorderTraversal(node->right, os);
 }
 
 void BST::displayTree() const {
-    inorderTraversal(root, std::cout);
+    inorderTraversal(root, std::cout);  // Print to console
     std::cout << std::endl;
 }
 
@@ -179,3 +180,25 @@ void BST::printTree(Node* node, int space, int indent) const {
     // Print left child
     printTree(node->left, space, indent);
 }
+
+// Method to get tree data as a vector of integers
+std::vector<int> BST::getData() const {
+    std::vector<int> data;
+    inorderTraversal(root, data);  // Perform inorder traversal and fill the vector
+    return data;
+}
+
+// Helper method for inorder traversal that fills a vector
+void BST::inorderTraversal(Node* node, std::vector<int>& data) const {
+    if (node == nullptr) return;
+    inorderTraversal(node->left, data);
+    data.push_back(node->value);  // Add node value to the vector
+    inorderTraversal(node->right, data);
+}
+
+BST::Node* BST::getRoot() const {
+    return root;
+}
+
+
+

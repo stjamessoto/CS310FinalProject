@@ -1,4 +1,3 @@
-//Queue.cpp
 #include "Queue.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
@@ -35,42 +34,41 @@ void Queue::display() const {
         return;
     }
 
+    std::cout << "Queue: ";
     for (int value : queue) {
         std::cout << value << " ";
     }
     std::cout << std::endl;
 }
 
-void Queue::draw(sf::RenderWindow& window) {
+void Queue::draw(sf::RenderWindow& window, const sf::Font& font) {
     // Draw the elements of the queue on the window
-    float xPos = 50.0f;
-    float yPos = 50.0f;
-    float offset = 40.0f; // Spacing between elements
+    float xPos = 100.0f;  // Starting position for drawing elements
+    float yPos = 250.0f;  // Y position for the first element
+    float offset = 60.0f; // Spacing between elements
 
-    sf::Font font;
-    if (!font.loadFromFile("edosz.ttf")) { // Ensure the font file is in the correct path
-        std::cerr << "Failed to load font!" << std::endl;
-        return;
-    }
-
-    for (int value : queue) {
+    // Iterate through each element in the queue and display it
+    for (size_t i = 0; i < queue.size(); ++i) {
         // Create a rectangle for each element in the queue
-        sf::RectangleShape rectangle(sf::Vector2f(30.0f, 30.0f));
-        rectangle.setPosition(xPos, yPos);
+        sf::RectangleShape rectangle(sf::Vector2f(50.0f, 50.0f));  // Adjusted size for better readability
+        rectangle.setPosition(xPos + (i * offset), yPos);
         rectangle.setFillColor(sf::Color::Green);
 
         // Create text to display the value inside the rectangle
         sf::Text text;
         text.setFont(font);
-        text.setString(std::to_string(value));
-        text.setCharacterSize(15);
+        text.setString(std::to_string(queue[i]));
+        text.setCharacterSize(20);  // Adjust text size for better readability
         text.setFillColor(sf::Color::Black);
-        text.setPosition(xPos + 5, yPos + 5); // Position the text inside the rectangle
+        text.setPosition(xPos + (i * offset) + 10, yPos + 10); // Center text inside rectangle
 
-        // Draw the rectangle and text
+        // Draw the rectangle and the text
         window.draw(rectangle);
         window.draw(text);
-
-        xPos += offset;  // Move the position for the next element
     }
+}
+
+std::vector<int> Queue::getElements() const {
+    // Convert deque to vector and return
+    return std::vector<int>(queue.begin(), queue.end());
 }

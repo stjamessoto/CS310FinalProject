@@ -30,6 +30,15 @@ public:
 
     // File parsing
     void parseFromFile(const std::string& fileName);
+
+    // Getter for the internal heap data (returns the heap as a vector of pairs)
+    std::vector<std::pair<int, int>> getData() const;  // Declaration only
+
+    // Getter for values (returns just the values from the heap)
+    std::vector<int> getValues() const;
+
+    // Getter for priorities (returns just the priorities from the heap)
+    std::vector<int> getPriorities() const;
 };
 
 #endif

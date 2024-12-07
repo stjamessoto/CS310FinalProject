@@ -1,15 +1,8 @@
-//BTree.cpp
 #include "BTree.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <SFML/Graphics.hpp>
-
-// BTreeNode Constructor
-BTreeNode::BTreeNode(int t, bool isLeaf) {
-    this->t = t;
-    this->isLeaf = isLeaf;
-}
 
 // Traverse the BTreeNode
 void BTreeNode::traverse() {
@@ -55,7 +48,7 @@ void BTreeNode::insertNonFull(int key) {
         while (i >= 0 && keys[i] > key) {
             i--;
         }
-        keys.insert(keys.begin() + i + 1, key);
+        keys.insert(keys.begin() + i + 1, key);  // Insert key correctly into keys vector
     } else {
         // Find the child to insert into
         while (i >= 0 && keys[i] > key) {
@@ -70,29 +63,35 @@ void BTreeNode::insertNonFull(int key) {
                 i++;
             }
         }
-        children[i]->insertNonFull(key);
+        children[i]->insertNonFull(key);  // Recurse into the child
     }
 }
 
 // Split the child node
 void BTreeNode::splitChild(int i, BTreeNode* y) {
     BTreeNode* z = new BTreeNode(y->t, y->isLeaf);
-    z->keys = std::vector<int>(y->keys.begin() + t, y->keys.end());
-    y->keys.resize(t - 1);
+    z->keys = std::vector<int>(y->keys.begin() + t, y->keys.end());  // Ensure keys is initialized as a vector
+    y->keys.resize(t - 1);  // Resize the parent's keys after splitting
 
     if (!y->isLeaf) {
-        z->children = std::vector<BTreeNode*>(y->children.begin() + t, y->children.end());
-        y->children.resize(t);
+        z->children = std::vector<BTreeNode*>(y->children.begin() + t, y->children.end());  // Initialize children properly
+        y->children.resize(t);  // Resize the parent's children after splitting
     }
 
-    children.insert(children.begin() + i + 1, z);
-    keys.insert(keys.begin() + i, y->keys[t - 1]);
+    children.insert(children.begin() + i + 1, z);  // Insert the new child into the children vector
+    keys.insert(keys.begin() + i, y->keys[t - 1]);  // Insert the middle key into the parent's keys
 }
 
 // BTree Constructor
 BTree::BTree(int t) {
     this->t = t;
-    root = new BTreeNode(t, true);
+    root = new BTreeNode(t, true);  // Create the root node with a minimum degree t
+}
+
+// BTree Default Constructor
+BTree::BTree() {
+    this->t = 2;  // default minimum degree
+    root = new BTreeNode(t, true); // Initialize root with a leaf node
 }
 
 // Traverse the tree
@@ -111,12 +110,15 @@ void BTree::print() {
 
 // Search for a key in the BTree
 bool BTree::search(int key) {
-    return root->search(key);
+    if (root != nullptr) {
+        return root->search(key);
+    }
+    return false; // Return false if the tree is empty
 }
 
 // Insert a key into the BTree
 void BTree::insert(int key) {
-    if (root->keys.size() == 2 * t - 1) {
+    if (root->keys.size() == 2 * t - 1) {  // If the root is full
         BTreeNode* s = new BTreeNode(t, false);
         s->children.push_back(root);
         s->splitChild(0, root);
@@ -125,10 +127,10 @@ void BTree::insert(int key) {
         if (s->keys[0] < key) {
             i++;
         }
-        s->children[i]->insertNonFull(key);
-        root = s;
+        s->children[i]->insertNonFull(key);  // Insert into the appropriate child
+        root = s;  // New root is the split node
     } else {
-        root->insertNonFull(key);
+        root->insertNonFull(key);  // Insert into the non-full root
     }
 }
 
@@ -147,13 +149,13 @@ void BTree::parseFromFile(const std::string& filename) {
     }
     int key;
     while (file >> key) {
-        insert(key);
+        insert(key);  // Insert each key read from the file
     }
     file.close();
 }
 
 // Helper function to draw the BTreeNode
-void BTree::drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y, float offset) {
+void BTree::drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y, float offset, const sf::Font& font) {
     if (!node) return;
 
     // Draw the node (keys)
@@ -162,27 +164,32 @@ void BTree::drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y
     nodeShape.setPosition(x, y);
     window.draw(nodeShape);
 
-    sf::Text text;
-    text.setFont(sf::Font());
-    text.setString(std::to_string(node->keys[0]));
-    text.setCharacterSize(20);
-    text.setFillColor(sf::Color::Black);
-    text.setPosition(x + 10, y + 10);
-    window.draw(text);
+    // Draw the keys in the node
+    for (size_t i = 0; i < node->keys.size(); ++i) {
+        sf::Text text;
+        text.setFont(font);  // Use passed font
+        text.setString(std::to_string(node->keys[i]));
+        text.setCharacterSize(20);
+        text.setFillColor(sf::Color::Black);
+        text.setPosition(x + 10 + i * 20, y + 10);
+        window.draw(text);
+    }
 
     // Recursively draw children nodes
-    float childOffset = offset / 2;
-    for (size_t i = 0; i < node->children.size(); ++i) {
-        float childX = x + (i - (node->children.size() / 2)) * 100;
-        float childY = y + 80;
-        drawNode(window, node->children[i], childX, childY, childOffset);
+    if (!node->isLeaf) {
+        float childOffset = offset / 2;
+        for (size_t i = 0; i < node->children.size(); ++i) {
+            float childX = x + (i - (node->children.size() / 2)) * 100;
+            float childY = y + 80;
+            drawNode(window, node->children[i], childX, childY, childOffset, font);  // Pass font here
+        }
     }
 }
 
 // Draw the BTree using SFML
-void BTree::draw(sf::RenderWindow& window) {
+void BTree::draw(sf::RenderWindow& window, const sf::Font& font) {
     if (root != nullptr) {
-        drawNode(window, root, 400, 50, 200);
+        drawNode(window, root, 400, 50, 200, font);  // Pass font here
     }
 }
 
@@ -200,15 +207,11 @@ void BTree::deleteValueFromNode(BTreeNode* node, int key) {
 
     if (i < node->keys.size() && node->keys[i] == key) {
         if (node->isLeaf) {
-            node->keys.erase(node->keys.begin() + i);
+            node->keys.erase(node->keys.begin() + i);  // Remove key from leaf node
         } else {
             // Handle internal node deletion (complex logic needed)
         }
     } else if (!node->isLeaf) {
-        deleteValueFromNode(node->children[i], key);
+        deleteValueFromNode(node->children[i], key);  // Recursively delete from child
     }
 }
-
-
-
-

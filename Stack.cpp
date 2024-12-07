@@ -47,7 +47,7 @@ void Stack::display() const {
 }
 
 // Draw the stack elements in a window (using SFML)
-void Stack::draw(sf::RenderWindow& window) {
+void Stack::draw(sf::RenderWindow& window, const sf::Font& font) {
     const float elementWidth = 50.f;
     const float elementHeight = 30.f;
     const float startX = 350.f;  // Start position for drawing the stack
@@ -67,12 +67,8 @@ void Stack::draw(sf::RenderWindow& window) {
         window.draw(rectangle);
 
         // Create text for the stack element
-        sf::Font font;
-        if (!font.loadFromFile("edosz.ttf")) {  // Ensure you have a font file
-            std::cerr << "Failed to load font!\n";
-        }
         sf::Text text;
-        text.setFont(font);
+        text.setFont(font);  // Set the passed font
         text.setString(std::to_string(stack[stack.size() - i - 1])); // Get stack value
         text.setCharacterSize(20);
         text.setFillColor(sf::Color::Black);
@@ -94,4 +90,9 @@ void Stack::print() const {
         }
         std::cout << "\n";
     }
+}
+
+// Return all elements of the stack
+std::vector<int> Stack::getElements() const {
+    return stack;
 }
