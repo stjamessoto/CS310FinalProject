@@ -1,4 +1,4 @@
-#include "RedBlack.h" 
+#include "RedBlack.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <fstream>
@@ -10,8 +10,7 @@ RedBlackTree::RedBlackTree() {
 }
 
 RedBlackTree::~RedBlackTree() {
-    // Recursively delete nodes starting from root if necessary
-    clear(root);
+    clear(root);  // Recursively delete nodes starting from root if necessary
 }
 
 void RedBlackTree::clear(RBNode* node) {
@@ -63,85 +62,13 @@ RBNode* RedBlackTree::searchTreeHelper(RBNode* node, int key) {
         return searchTreeHelper(node->right, key);
 }
 
-void RedBlackTree::balanceInsert(RBNode* node) {
-    RBNode* uncle;
-
-    while (node->parent->color == RED) {
-        if (node->parent == node->parent->parent->right) {
-            uncle = node->parent->parent->left;
-            if (uncle->color == RED) {
-                // Case 1: Uncle is red
-                uncle->color = BLACK;
-                node->parent->color = BLACK;
-                node->parent->parent->color = RED;
-                node = node->parent->parent;
-            } else {
-                if (node == node->parent->left) {
-                    // Case 2: Node is left child
-                    node = node->parent;
-                    rightRotate(node);
-                }
-                // Case 3: Node is right child
-                node->parent->color = BLACK;
-                node->parent->parent->color = RED;
-                leftRotate(node->parent->parent);
-            }
-        } else {
-            uncle = node->parent->parent->right;
-            if (uncle->color == RED) {
-                // Case 1: Uncle is red
-                uncle->color = BLACK;
-                node->parent->color = BLACK;
-                node->parent->parent->color = RED;
-                node = node->parent->parent;
-            } else {
-                if (node == node->parent->right) {
-                    // Case 2: Node is right child
-                    node = node->parent;
-                    leftRotate(node);
-                }
-                // Case 3: Node is left child
-                node->parent->color = BLACK;
-                node->parent->parent->color = RED;
-                rightRotate(node->parent->parent);
-            }
-        }
-        if (node == root)
-            break;
-    }
-    root->color = BLACK;
+bool RedBlackTree::contains(int key) {
+    return search(key);  // Calls the existing search method
 }
 
-void RedBlackTree::leftRotate(RBNode* x) {
-    RBNode* y = x->right;
-    x->right = y->left;
-    if (y->left != TNULL)
-        y->left->parent = x;
-    y->parent = x->parent;
-    if (x->parent == nullptr)
-        root = y;
-    else if (x == x->parent->left)
-        x->parent->left = y;
-    else
-        x->parent->right = y;
-    y->left = x;
-    x->parent = y;
-}
-
-void RedBlackTree::rightRotate(RBNode* x) {
-    RBNode* y = x->left;
-    x->left = y->right;
-    if (y->right != TNULL)
-        y->right->parent = x;
-    y->parent = x->parent;
-    if (x->parent == nullptr)
-        root = y;
-    else if (x == x->parent->right)
-        x->parent->right = y;
-    else
-        x->parent->left = y;
-    y->right = x;
-    x->parent = y;
+bool RedBlackTree::search(int key) {
+    RBNode* node = searchTreeHelper(root, key);
+    return (node != TNULL);  // Returns true if found, false otherwise
 }
 
 void RedBlackTree::insert(int key) {
@@ -150,7 +77,7 @@ void RedBlackTree::insert(int key) {
     node->data = key;
     node->left = TNULL;
     node->right = TNULL;
-    node->color = RED;
+    node->color = RED;  // New node is always red initially
 
     RBNode* y = nullptr;
     RBNode* x = root;
@@ -165,7 +92,7 @@ void RedBlackTree::insert(int key) {
 
     node->parent = y;
     if (y == nullptr)
-        root = node;
+        root = node;  // Tree was empty
     else if (node->data < y->data)
         y->left = node;
     else
@@ -179,12 +106,7 @@ void RedBlackTree::insert(int key) {
     if (node->parent->parent == nullptr)
         return;
 
-    balanceInsert(node);
-}
-
-bool RedBlackTree::search(int key) {
-    RBNode* node = searchTreeHelper(root, key);
-    return (node != TNULL);
+    balanceInsert(node);  // Balance the tree after insertion
 }
 
 void RedBlackTree::deleteValue(int key) {
@@ -199,7 +121,7 @@ void RedBlackTree::deleteNodeHelper(RBNode* node, int key) {
             z = node;
         }
 
-        if (node->data <= key)
+        if (node->data < key)  // Fix comparison here
             node = node->right;
         else
             node = node->left;
@@ -234,7 +156,7 @@ void RedBlackTree::deleteNodeHelper(RBNode* node, int key) {
         y->color = z->color;
     }
     if (yOriginalColor == BLACK)
-        balanceDelete(x);
+        balanceDelete(x);  // Balance the tree after deletion
 }
 
 void RedBlackTree::transplant(RBNode* u, RBNode* v) {
@@ -313,9 +235,81 @@ void RedBlackTree::balanceDelete(RBNode* x) {
     x->color = BLACK;
 }
 
+void RedBlackTree::balanceInsert(RBNode* k) {
+    RBNode* u;
+    while (k->parent->color == RED) {
+        if (k->parent == k->parent->parent->right) {
+            u = k->parent->parent->left;
+            if (u->color == RED) {
+                u->color = BLACK;
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                k = k->parent->parent;
+            } else {
+                if (k == k->parent->left) {
+                    k = k->parent;
+                    rightRotate(k);
+                }
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                leftRotate(k->parent->parent);
+            }
+        } else {
+            u = k->parent->parent->right;
+            if (u->color == RED) {
+                u->color = BLACK;
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                k = k->parent->parent;
+            } else {
+                if (k == k->parent->right) {
+                    k = k->parent;
+                    leftRotate(k);
+                }
+                k->parent->color = BLACK;
+                k->parent->parent->color = RED;
+                rightRotate(k->parent->parent);
+            }
+        }
+        if (k == root)
+            break;
+    }
+    root->color = BLACK;
+}
+
+void RedBlackTree::leftRotate(RBNode* x) {
+    RBNode* y = x->right;
+    x->right = y->left;
+    if (y->left != TNULL)
+        y->left->parent = x;
+    y->parent = x->parent;
+    if (x->parent == nullptr)
+        root = y;
+    else if (x == x->parent->left)
+        x->parent->left = y;
+    else
+        x->parent->right = y;
+    y->left = x;
+    x->parent = y;
+}
+
+void RedBlackTree::rightRotate(RBNode* x) {
+    RBNode* y = x->left;
+    x->left = y->right;
+    if (y->right != TNULL)
+        y->right->parent = x;
+    y->parent = x->parent;
+    if (x->parent == nullptr)
+        root = y;
+    else if (x == x->parent->right)
+        x->parent->right = y;
+    else
+        x->parent->left = y;
+    y->right = x;
+    x->parent = y;
+}
+
 void RedBlackTree::display() {
-    // Implement this function if needed for printing or debugging.
-    // For example, you could use inOrderHelper for an in-order traversal print
     inOrderHelper(root);
     std::cout << std::endl;
 }
@@ -338,8 +332,7 @@ void RedBlackTree::parseFromFile(const std::string& filename) {
 }
 
 void RedBlackTree::draw(sf::RenderWindow& window, const sf::Font& font) {
-    // Draw the tree by traversing it
-    drawNode(window, root, 400, 50, font);
+    drawNode(window, root, 400, 50, font);  // Draw the tree starting from root
 }
 
 void RedBlackTree::drawNode(sf::RenderWindow& window, RBNode* node, float x, float y, const sf::Font& font) {

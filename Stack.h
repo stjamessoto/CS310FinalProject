@@ -1,4 +1,3 @@
-//stack.h
 #ifndef STACK_H
 #define STACK_H
 
@@ -34,6 +33,9 @@ public:
 
     // Return all elements of the stack
     std::vector<int> getElements() const;
+
+    // Check if the stack contains a specific element
+    bool contains(int value) const;
 };
 
 #endif // STACK_H

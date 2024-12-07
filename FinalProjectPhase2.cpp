@@ -65,38 +65,6 @@ public:
     }
 };
 
-// Load data from file and insert into all ADTs
-void loadDataFromFile(const std::string& filename, std::vector<int>& data, std::atomic<bool>& done,
-                      ADTType currentADT, Heap& heap, BST& bst, AVL& avl, Stack& stack, Queue& queue,
-                      BTree& btree, PriorityQueue& priorityQueue, RedBlackTree& rbt) {
-    std::ifstream file(filename);
-    std::string line;
-
-    data.clear();
-    while (std::getline(file, line)) {
-        try {
-            int value = std::stoi(line);
-            data.push_back(value);
-
-            // Insert into all ADTs
-            heap.insert(value);
-            bst.insert(value);
-            avl.insert(value);
-            stack.push(value);
-            queue.enqueue(value);
-            btree.insert(value);
-            priorityQueue.insert(value, value);
-            rbt.insert(value);
-
-            std::cout << "Inserted value: " << value << " into all ADTs.\n";
-        } catch (const std::exception& e) {
-            std::cerr << "Error reading value from file: " << e.what() << "\n";
-        }
-    }
-    done = true;
-    std::cout << "File loaded and data inserted into all ADTs.\n";
-}
-
 // Mock function to select a file
 std::string browseFile() {
     return "sample.txt";  // Replace this with actual file browsing logic if needed
@@ -133,6 +101,38 @@ void viewADT(ADTType currentADT, Heap& heap, BST& bst, AVL& avl, BTree& btree, R
     window.display();
 }
 
+// Function to load data from a file and insert into all ADTs
+void loadDataFromFile(const std::string& filename, std::vector<int>& data, std::atomic<bool>& done,
+                      ADTType currentADT, Heap& heap, BST& bst, AVL& avl, Stack& stack, Queue& queue,
+                      BTree& btree, PriorityQueue& priorityQueue, RedBlackTree& rbt) {
+    std::ifstream file(filename);
+    std::string line;
+
+    data.clear();
+    while (std::getline(file, line)) {
+        try {
+            int value = std::stoi(line);
+            data.push_back(value);
+
+            // Insert into all ADTs
+            heap.insert(value);
+            bst.insert(value);
+            avl.insert(value);
+            stack.push(value);
+            queue.enqueue(value);
+            btree.insert(value);
+            priorityQueue.insert(value, value);
+            rbt.insert(value);
+
+            std::cout << "Inserted value: " << value << " into all ADTs.\n";
+        } catch (const std::exception& e) {
+            std::cerr << "Error reading value from file: " << e.what() << "\n";
+        }
+    }
+    done = true;
+    std::cout << "File loaded and data inserted into all ADTs.\n";
+}
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ADT Menu");
 
@@ -143,9 +143,9 @@ int main() {
     }
 
     AppState appState = AppState::MAIN_MENU;
-    Menu mainMenu(window.getSize().x, window.getSize().y, {"Select ADT", "Insert", "Delete", "Search", "View ADT", "Import from File"}, font);
+    Menu mainMenu(window.getSize().x, window.getSize().y, {"Select ADT", "Import from File"}, font);
     Menu adtMenu(window.getSize().x, window.getSize().y, {"Heap", "BST", "AVL", "BTree", "Stack", "Queue", "Priority Queue", "Red-Black Tree"}, font);
-    Menu operationMenu(window.getSize().x, window.getSize().y, {"Insert", "Delete", "Search", "View"}, font);
+    Menu operationMenu(window.getSize().x, window.getSize().y, {"Insert", "Delete", "Search", "Push/Pop", "View"}, font);
 
     ADTType currentADT = ADTType::HEAP;
 
@@ -177,8 +177,7 @@ int main() {
                         if (event.key.code == sf::Keyboard::Enter) {
                             int selectedOption = mainMenu.getSelectedItemIndex();
                             if (selectedOption == 0) appState = AppState::ADT_SELECTION;
-                            else if (selectedOption == 4) appState = AppState::VIEW_ADT;
-                            else if (selectedOption == 5) {
+                            else if (selectedOption == 1) {
                                 std::string fileName = browseFile();
                                 done = false;
                                 fileThread = std::thread(loadDataFromFile, fileName, std::ref(data), std::ref(done),
@@ -203,7 +202,59 @@ int main() {
                         if (event.key.code == sf::Keyboard::Down) operationMenu.moveDown();
                         if (event.key.code == sf::Keyboard::Enter) {
                             int option = operationMenu.getSelectedItemIndex();
-                            if (option == 3) appState = AppState::VIEW_ADT;
+                            if (option == 0) {
+                                // Insert operation (hardcoded value 10)
+                                int value = 10;  // Hardcoded value for insertion
+                                if (currentADT == ADTType::HEAP) {
+                                    heap.insert(value);
+                                } else if (currentADT == ADTType::BST) {
+                                    bst.insert(value);
+                                } else if (currentADT == ADTType::AVL) {
+                                    avl.insert(value);
+                                } else if (currentADT == ADTType::STACK) {
+                                    stack.push(value);
+                                } else if (currentADT == ADTType::QUEUE) {
+                                    queue.enqueue(value);
+                                } else if (currentADT == ADTType::BTREE) {
+                                    btree.insert(value);
+                                } else if (currentADT == ADTType::PRIORITY_QUEUE) {
+                                    priorityQueue.insert(value, value);
+                                } else if (currentADT == ADTType::RED_BLACK_TREE) {
+                                    rbt.insert(value);
+                                }
+                                std::cout << "Inserted " << value << " into selected ADT.\n";
+                            } else if (option == 1) {
+                                // Delete operation (hardcoded value 10)
+                                int value = 10;  // Hardcoded value for deletion
+                                if (currentADT == ADTType::HEAP) {
+                                    int removedValue = heap.deleteRoot();
+                                    std::cout << "Removed " << removedValue << " from the heap.\n";
+                                } else if (currentADT == ADTType::BST) {
+                                    bst.deleteValue(value);
+                                    std::cout << "Deleted " << value << " from the BST.\n";
+                                } else if (currentADT == ADTType::STACK) {
+                                    stack.pop();
+                                    std::cout << "Popped top element from the stack.\n";
+                                }
+                            } else if (option == 2) {
+                                // Search operation
+                                int searchValue = 10;
+                                bool found = false;
+                                if (currentADT == ADTType::HEAP) {
+                                    found = heap.contains(searchValue);
+                                } else if (currentADT == ADTType::BST) {
+                                    found = bst.search(searchValue);
+                                } else if (currentADT == ADTType::STACK) {
+                                    found = stack.contains(searchValue);
+                                }
+                                std::cout << "Search for " << searchValue << " " << (found ? "found" : "not found") << ".\n";
+                            } else if (option == 3) {
+                                // Push/Pop Stack operation
+                                if (currentADT == ADTType::STACK) {
+                                    stack.pop();
+                                    std::cout << "Popped top element from the stack.\n";
+                                }
+                            } else if (option == 4) appState = AppState::VIEW_ADT;
                         }
                         break;
 

@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <stdexcept>
+#include <fstream>  
 
 // Constructor and Destructor
 AVL::AVL() : root(nullptr) {}
@@ -18,6 +19,33 @@ void AVL::insert(int key) {
 void AVL::deleteValue(int key) {
     root = deleteNode(root, key);  // Delete starting from root
 }
+
+// Contains Method to Check if a Key Exists and Return Position
+bool AVL::contains(int key, int& depth, int& order) const {
+    depth = 0;  // Initialize depth
+    order = 1;  // Initialize order
+    return calculateDepth(root, key, depth) != -1 && calculateOrder(root, key, order) != -1;
+}
+
+// Search Method (calls the helper)
+bool AVL::search(int key) const {
+    return searchHelper(root, key);  // Start search from the root
+}
+
+bool AVL::searchHelper(AVLNode* node, int key) const {
+    if (node == nullptr) {
+        return false; // Key not found
+    }
+    if (node->key == key) {
+        return true; // Key found
+    }
+    if (key < node->key) {
+        return searchHelper(node->left, key); // Search in the left subtree
+    } else {
+        return searchHelper(node->right, key); // Search in the right subtree
+    }
+}
+
 
 // Parsing from File
 void AVL::parseFromFile(const std::string& fileName) {

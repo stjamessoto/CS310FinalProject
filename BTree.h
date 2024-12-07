@@ -44,6 +44,7 @@ public:
     BTree();       // Default constructor to initialize an empty tree
     void traverse();
     bool search(int key);
+    bool contains(int key);  // New contains method
     void insert(int key);
     void display();
     void parseFromFile(const std::string& filename);
@@ -63,4 +64,3 @@ public:
 };
 
 #endif
-

@@ -26,9 +26,10 @@ public:
     ~AVL();
 
     // Core AVL Tree Operations
-    void insert(int key);
-    void deleteValue(int key);
-    bool search(int key) const;
+    void insert(int key);                          // Insert a key
+    void deleteValue(int key);                     // Delete a key
+    bool search(int key) const;                    // Search for a key
+    bool contains(int key, int& depth, int& order) const;  // Check if key exists, return depth and order
 
     // Additional Operations
     void parseFromFile(const std::string& fileName);  // Load tree from a file
@@ -39,38 +40,38 @@ public:
     std::vector<int> getData() const;                 // Return all data in in-order traversal
 
     // Visualization
-    void draw(sf::RenderWindow& window, const sf::Font& font);  // Updated to include sf::Font
+    void draw(sf::RenderWindow& window, const sf::Font& font);  // Draw the tree using SFML
 
 private:
     AVLNode* root;
 
     // Internal Recursive Helper Functions
-    AVLNode* insert(AVLNode* node, int key);
-    AVLNode* deleteNode(AVLNode* node, int key);
-    AVLNode* minValueNode(AVLNode* node);
-    int getHeight(AVLNode* node) const;
-    int getBalanceFactor(AVLNode* node) const;
+    AVLNode* insert(AVLNode* node, int key);                 // Recursive insert
+    AVLNode* deleteNode(AVLNode* node, int key);              // Recursive delete
+    AVLNode* minValueNode(AVLNode* node);                     // Find minimum node
+    int getHeight(AVLNode* node) const;                       // Get the height of a node
+    int getBalanceFactor(AVLNode* node) const;                // Get the balance factor of a node
 
     // Balance function for AVL tree
-    AVLNode* balance(AVLNode* node);  // Added balance function declaration
+    AVLNode* balance(AVLNode* node);                          // Balance the tree
 
     // Rotations for Balancing
-    AVLNode* rotateRight(AVLNode* y);
-    AVLNode* rotateLeft(AVLNode* x);
+    AVLNode* rotateRight(AVLNode* y);                         // Perform right rotation
+    AVLNode* rotateLeft(AVLNode* x);                          // Perform left rotation
 
     // Traversal Helpers
-    void inOrderTraversal(AVLNode* node, std::vector<int>& keys) const;
-    void clear(AVLNode* node);
-    void printInOrder(AVLNode* node) const;
+    void inOrderTraversal(AVLNode* node, std::vector<int>& keys) const;  // In-order traversal
+    void clear(AVLNode* node);                                  // Clear the tree
+    void printInOrder(AVLNode* node) const;                      // Print nodes in in-order
 
     // Helper Functions for New Features
-    int calculateDepth(AVLNode* node, int key, int depth) const;
-    int calculateOrder(AVLNode* node, int key, int& order) const;
-    bool searchHelper(AVLNode* node, int key) const;
+    int calculateDepth(AVLNode* node, int key, int depth) const;  // Calculate the depth of a key
+    int calculateOrder(AVLNode* node, int key, int& order) const; // Calculate in-order position of a key
+    bool searchHelper(AVLNode* node, int key) const;              // Recursive helper for search
 
     // Visualization Helper
     void drawNode(sf::RenderWindow& window, AVLNode* node, const sf::Font& font,
-                  float x, float y, float xOffset) const;
+                  float x, float y, float xOffset) const;            // Draw a node using SFML
 };
 
 #endif // AVL_H

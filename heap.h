@@ -1,4 +1,3 @@
-// heap.h
 #ifndef HEAP_H
 #define HEAP_H
 
@@ -17,8 +16,9 @@ private:
 public:
     Heap();                      // Constructor
     void insert(int value);      // Insert a value into the heap
+    int deleteRoot();            // Delete the root of the heap and return its value
     void deleteValue(int value); // Delete a specific value from the heap
-    bool search(int value);      // Search for a value in the heap
+    bool contains(int value);    // Check if the heap contains a specific value
     void parseFromFile(const std::string& fileName); // Populate heap from a file
     void buildHeap(const std::vector<int>& data);  // Build the heap from a given data array
     void displayHeap();          // Display the heap contents

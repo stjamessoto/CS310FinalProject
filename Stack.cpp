@@ -1,4 +1,3 @@
-//stack.cpp
 #include "Stack.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -95,4 +94,15 @@ void Stack::print() const {
 // Return all elements of the stack
 std::vector<int> Stack::getElements() const {
     return stack;
+}
+
+// Check if the stack contains a specific element
+bool Stack::contains(int value) const {
+    // Iterate through each element in the stack
+    for (int element : stack) {
+        if (element == value) {
+            return true;  // Return true if the element is found
+        }
+    }
+    return false;  // Return false if the element is not found
 }

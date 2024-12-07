@@ -116,6 +116,14 @@ bool BTree::search(int key) {
     return false; // Return false if the tree is empty
 }
 
+// Contains method (checks if the tree contains the given key)
+bool BTree::contains(int key) {
+    if (root != nullptr) {
+        return root->search(key);  // Simply reuse the search method
+    }
+    return false; // Return false if the tree is empty
+}
+
 // Insert a key into the BTree
 void BTree::insert(int key) {
     if (root->keys.size() == 2 * t - 1) {  // If the root is full
@@ -154,24 +162,24 @@ void BTree::parseFromFile(const std::string& filename) {
     file.close();
 }
 
-// Helper function to draw the BTreeNode
+// Helper function to draw the BTreeNode using rectangles
 void BTree::drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y, float offset, const sf::Font& font) {
     if (!node) return;
 
-    // Draw the node (keys)
-    sf::CircleShape nodeShape(30);
+    // Draw the node (rectangular shape for each node)
+    sf::RectangleShape nodeShape(sf::Vector2f(60, 50));  // Rectangle shape with width and height
     nodeShape.setFillColor(sf::Color::Green);
-    nodeShape.setPosition(x, y);
+    nodeShape.setPosition(x - 30, y - 25);  // Center the rectangle on (x, y)
     window.draw(nodeShape);
 
     // Draw the keys in the node
     for (size_t i = 0; i < node->keys.size(); ++i) {
         sf::Text text;
-        text.setFont(font);  // Use passed font
+        text.setFont(font);
         text.setString(std::to_string(node->keys[i]));
         text.setCharacterSize(20);
         text.setFillColor(sf::Color::Black);
-        text.setPosition(x + 10 + i * 20, y + 10);
+        text.setPosition(x - 10 + i * 20, y - 10);  // Center the text inside the rectangle
         window.draw(text);
     }
 
@@ -179,9 +187,17 @@ void BTree::drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y
     if (!node->isLeaf) {
         float childOffset = offset / 2;
         for (size_t i = 0; i < node->children.size(); ++i) {
-            float childX = x + (i - (node->children.size() / 2)) * 100;
-            float childY = y + 80;
-            drawNode(window, node->children[i], childX, childY, childOffset, font);  // Pass font here
+            float childX = x + (i - (node->children.size() / 2)) * 100;  // Space children evenly
+            float childY = y + 80;  // Draw children below their parent
+            // Draw an edge connecting parent to child
+            sf::VertexArray line(sf::Lines, 2);
+            line[0].position = sf::Vector2f(x, y + 25);  // Bottom of the parent's rectangle
+            line[1].position = sf::Vector2f(childX, childY - 25);  // Top of the child's rectangle
+            line[0].color = sf::Color::Black;
+            line[1].color = sf::Color::Black;
+            window.draw(line);
+
+            drawNode(window, node->children[i], childX, childY, childOffset, font);  // Recursively draw child node
         }
     }
 }
@@ -189,7 +205,7 @@ void BTree::drawNode(sf::RenderWindow& window, BTreeNode* node, float x, float y
 // Draw the BTree using SFML
 void BTree::draw(sf::RenderWindow& window, const sf::Font& font) {
     if (root != nullptr) {
-        drawNode(window, root, 400, 50, 200, font);  // Pass font here
+        drawNode(window, root, 400, 50, 200, font);  // Starting point for the root node
     }
 }
 

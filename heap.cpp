@@ -52,8 +52,8 @@ void Heap::deleteValue(int value) {
     }
 }
 
-// Search for a value in the heap
-bool Heap::search(int value) {
+// Check if a value is contained in the heap
+bool Heap::contains(int value) {
     return std::find(heap.begin(), heap.end(), value) != heap.end();
 }
 
@@ -80,6 +80,25 @@ void Heap::buildHeap(const std::vector<int>& data) {
     for (int i = heap.size() / 2 - 1; i >= 0; --i) {
         heapifyDown(i);
     }
+}
+
+// Delete the root of the heap and return its value
+int Heap::deleteRoot() {
+    if (heap.empty()) {
+        throw std::out_of_range("Heap is empty");
+    }
+
+    // Get the root value (the first element in the vector)
+    int rootValue = heap[0];
+
+    // Replace the root with the last element in the heap
+    heap[0] = heap.back();
+    heap.pop_back();
+
+    // Restore the heap property by calling heapifyDown
+    heapifyDown(0);
+
+    return rootValue;
 }
 
 // Display the heap contents
@@ -155,4 +174,3 @@ void Heap::print() const {
 std::vector<int> Heap::getData() const {
     return heap;
 }
-

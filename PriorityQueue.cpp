@@ -1,8 +1,9 @@
-#include "PriorityQueue.h"
+#include "PriorityQueue.h" 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <SFML/Graphics.hpp>
+#include <algorithm>  // For std::find_if
 
 // Helper function to maintain the heap property after adding an element (heapify upwards)
 void PriorityQueue::heapifyUp(int index) {
@@ -179,4 +180,41 @@ std::vector<int> PriorityQueue::getPriorities() const {
         priorities.push_back(item.first);  // 'first' is the priority part of the pair
     }
     return priorities;
+}
+
+// Check if the priority queue contains a specific value
+bool PriorityQueue::contains(int value) const {
+    for (const auto& pair : heap) {
+        if (pair.second == value) {
+            return true; // Found the value
+        }
+    }
+    return false; // Value not found
+}
+
+// Remove a specific value from the priority queue
+void PriorityQueue::deleteValue(int value) {
+    // Find the element by its value
+    auto it = std::find_if(heap.begin(), heap.end(), [value](const std::pair<int, int>& pair) {
+        return pair.second == value;
+    });
+
+    // If the element is not found, do nothing
+    if (it == heap.end()) {
+        std::cerr << "Value not found in the priority queue" << std::endl;
+        return;
+    }
+
+    // Get the index of the element to remove
+    int index = std::distance(heap.begin(), it);
+
+    // Swap the found element with the last element
+    std::swap(heap[index], heap.back());
+
+    // Remove the last element
+    heap.pop_back();
+
+    // Rebalance the heap
+    heapifyDown(index);
+    heapifyUp(index);
 }

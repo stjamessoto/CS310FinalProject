@@ -4,6 +4,7 @@
 #include <deque>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <algorithm>  
 
 class Queue {
 private:
@@ -33,6 +34,9 @@ public:
 
     // Return the queue elements as a vector
     std::vector<int> getElements() const;
+
+    // Check if a value is in the queue
+    bool contains(int value) const;
 };
 
 #endif // QUEUE_H

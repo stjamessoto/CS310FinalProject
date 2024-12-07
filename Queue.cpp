@@ -1,6 +1,7 @@
 #include "Queue.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <algorithm> 
 
 void Queue::enqueue(int value) {
     // Add an element to the back of the queue
@@ -71,4 +72,9 @@ void Queue::draw(sf::RenderWindow& window, const sf::Font& font) {
 std::vector<int> Queue::getElements() const {
     // Convert deque to vector and return
     return std::vector<int>(queue.begin(), queue.end());
+}
+
+bool Queue::contains(int value) const {
+    // Use std::find to check if value is in the deque
+    return std::find(queue.begin(), queue.end(), value) != queue.end();
 }

@@ -1,4 +1,3 @@
-//PriorityQueue.h
 #ifndef PRIORITYQUEUE_H
 #define PRIORITYQUEUE_H
 
@@ -47,6 +46,12 @@ public:
 
     // Getter for priorities (returns just the priorities from the heap)
     std::vector<int> getPriorities() const;
+
+    // Check if the priority queue contains a value
+    bool contains(int value) const;
+
+    // Remove a specific value from the priority queue
+    void deleteValue(int value);
 };
 
 #endif

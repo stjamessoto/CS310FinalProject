@@ -1,4 +1,3 @@
-// Bst.cpp
 #include "Bst.h"
 #include <iostream>
 #include <fstream>
@@ -78,6 +77,11 @@ bool BST::searchNode(Node* node, int value) {
         return true;
     }
     return value < node->value ? searchNode(node->left, value) : searchNode(node->right, value);
+}
+
+// New contains method
+bool BST::contains(int value) {
+    return search(value);  // Delegates to the search function
 }
 
 void BST::inorderTraversal(Node* node, std::ostream& os) const {
