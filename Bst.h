@@ -42,7 +42,7 @@ public:
     bool search(int value);
     void displayTree() const;
     void parseFromFile(const std::string& fileName);
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window, const sf::Font& font);
 
     Node* getRoot() const;  // Get the root node
 

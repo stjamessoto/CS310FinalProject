@@ -1,4 +1,4 @@
-//Bst.cpp
+// Bst.cpp
 #include "Bst.h"
 #include <iostream>
 #include <fstream>
@@ -152,7 +152,7 @@ void BST::drawNode(sf::RenderWindow& window, Node* node, float x, float y, float
 }
 
 // Public function to draw the entire tree
-void BST::draw(sf::RenderWindow& window) {
+void BST::draw(sf::RenderWindow& window, const sf::Font& font) {
     drawNode(window, root, window.getSize().x / 2, 50, 200);
 }
 
@@ -199,6 +199,3 @@ void BST::inorderTraversal(Node* node, std::vector<int>& data) const {
 BST::Node* BST::getRoot() const {
     return root;
 }
-
-
-

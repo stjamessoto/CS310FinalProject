@@ -1,7 +1,7 @@
-// RedBlack.cpp
-#include "RedBlack.h"
+#include "RedBlack.h" 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <fstream>
 
 RedBlackTree::RedBlackTree() {
     TNULL = new RBNode(0);  // Create a sentinel node
@@ -10,8 +10,16 @@ RedBlackTree::RedBlackTree() {
 }
 
 RedBlackTree::~RedBlackTree() {
-    // Recursively delete nodes starting from root
-    // Add your clear function here if necessary
+    // Recursively delete nodes starting from root if necessary
+    clear(root);
+}
+
+void RedBlackTree::clear(RBNode* node) {
+    if (node != TNULL) {
+        clear(node->left);
+        clear(node->right);
+        delete node;
+    }
 }
 
 void RedBlackTree::initializeNULLNode(RBNode* node, RBNode* parent) {
@@ -329,8 +337,42 @@ void RedBlackTree::parseFromFile(const std::string& filename) {
     file.close();
 }
 
-void RedBlackTree::draw(sf::RenderWindow& window) {
-    // Implement drawing the tree structure with SFML here
-    // Consider writing a recursive helper function to draw nodes and edges
+void RedBlackTree::draw(sf::RenderWindow& window, const sf::Font& font) {
+    // Draw the tree by traversing it
+    drawNode(window, root, 400, 50, font);
 }
 
+void RedBlackTree::drawNode(sf::RenderWindow& window, RBNode* node, float x, float y, const sf::Font& font) {
+    if (node == TNULL) return;
+
+    // Draw the current node's value
+    sf::CircleShape circle(20);
+    circle.setFillColor(node->color == RED ? sf::Color::Red : sf::Color::Black);
+    circle.setPosition(x - 20, y - 20);
+    window.draw(circle);
+
+    // Display the value as text
+    sf::Text text(std::to_string(node->data), font, 15);
+    text.setFillColor(sf::Color::White);
+    text.setPosition(x - 10, y - 10);
+    window.draw(text);
+
+    // Draw left and right child nodes
+    if (node->left != TNULL) {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(x, y)),
+            sf::Vertex(sf::Vector2f(x - 50, y + 50))
+        };
+        window.draw(line, 2, sf::Lines);
+        drawNode(window, node->left, x - 50, y + 50, font);
+    }
+
+    if (node->right != TNULL) {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(x, y)),
+            sf::Vertex(sf::Vector2f(x + 50, y + 50))
+        };
+        window.draw(line, 2, sf::Lines);
+        drawNode(window, node->right, x + 50, y + 50, font);
+    }
+}

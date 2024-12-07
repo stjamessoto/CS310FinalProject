@@ -1,24 +1,22 @@
-//AVL.cpp
 #include "AVL.h"
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <stdexcept>  
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <stdexcept>
 
 // Constructor and Destructor
 AVL::AVL() : root(nullptr) {}
 
 AVL::~AVL() {
-    clear(root);
+    clear(root);  // Recursively delete all nodes
 }
 
 // Insert and Delete Operations
 void AVL::insert(int key) {
-    root = insert(root, key);
+    root = insert(root, key);  // Insert starting from root
 }
 
 void AVL::deleteValue(int key) {
-    root = deleteNode(root, key);
+    root = deleteNode(root, key);  // Delete starting from root
 }
 
 // Parsing from File
@@ -62,8 +60,7 @@ int AVL::getDepth(int key) const {
 
 int AVL::getOrder(int key) const {
     int order = 1; // Order starts at 1
-    calculateOrder(root, key, order);  // Order calculation
-    return order;
+    return calculateOrder(root, key, order);  // Order calculation
 }
 
 // Return a vector of all keys in in-order traversal
@@ -82,126 +79,163 @@ void AVL::inOrderTraversal(AVLNode* node, std::vector<int>& keys) const {
     }
 }
 
-// AVL Tree Node Insertion and Deletion
-AVLNode* AVL::insert(AVLNode* node, int key) {
-    if (!node) return new AVLNode(key);  // Create new node if empty
+// AVL Tree Drawing
+void AVL::draw(sf::RenderWindow& window, const sf::Font& font) {
+    if (!root) return;
 
-    if (key < node->key)
-        node->left = insert(node->left, key);  // Insert into left subtree
-    else if (key > node->key)
-        node->right = insert(node->right, key);  // Insert into right subtree
-    else
-        return node;  // Duplicates not allowed
+    float xOffset = 400.0f;  // Initial horizontal offset
+    drawNode(window, root, font, window.getSize().x / 2.0f, 50.0f, xOffset);
+}
+
+void AVL::drawNode(sf::RenderWindow& window, AVLNode* node, const sf::Font& font,
+                   float x, float y, float xOffset) const {
+    if (!node) return;
+
+    const float yOffset = 75.0f;  // Vertical distance between nodes
+
+    // Draw left subtree
+    if (node->left) {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(x, y + 20), sf::Color::Black),
+            sf::Vertex(sf::Vector2f(x - xOffset, y + yOffset), sf::Color::Black)
+        };
+        window.draw(line, 2, sf::Lines);
+        drawNode(window, node->left, font, x - xOffset, y + yOffset, xOffset / 2.0f);
+    }
+
+    // Draw right subtree
+    if (node->right) {
+        sf::Vertex line[] = {
+            sf::Vertex(sf::Vector2f(x, y + 20), sf::Color::Black),
+            sf::Vertex(sf::Vector2f(x + xOffset, y + yOffset), sf::Color::Black)
+        };
+        window.draw(line, 2, sf::Lines);
+        drawNode(window, node->right, font, x + xOffset, y + yOffset, xOffset / 2.0f);
+    }
+
+    // Draw node (circle and key)
+    sf::CircleShape circle(20);
+    circle.setFillColor(sf::Color::White);
+    circle.setOutlineColor(sf::Color::Black);
+    circle.setOutlineThickness(2);
+    circle.setPosition(x - 20, y);
+    window.draw(circle);
+
+    sf::Text text;
+    text.setFont(font);
+    text.setString(std::to_string(node->key));
+    text.setCharacterSize(15);
+    text.setFillColor(sf::Color::Black);
+    text.setPosition(x - 10, y + 5);
+    window.draw(text);
+}
+
+// Internal Recursive Helper Functions
+
+void AVL::clear(AVLNode* node) {
+    if (node != nullptr) {
+        clear(node->left);   // Recursively delete left subtree
+        clear(node->right);  // Recursively delete right subtree
+        delete node;         // Delete current node
+    }
+}
+
+AVLNode* AVL::insert(AVLNode* node, int key) {
+    if (node == nullptr) {
+        return new AVLNode(key);  // Create new node if the tree is empty
+    }
+
+    if (key < node->key) {
+        node->left = insert(node->left, key);  // Insert in left subtree
+    } else if (key > node->key) {
+        node->right = insert(node->right, key);  // Insert in right subtree
+    } else {
+        return node;  // Duplicate key is not inserted
+    }
 
     node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));  // Update height
-
-    int balance = getBalanceFactor(node);
-
-    // Left Left case
-    if (balance > 1 && key < node->left->key)
-        return rotateRight(node);
-
-    // Right Right case
-    if (balance < -1 && key > node->right->key)
-        return rotateLeft(node);
-
-    // Left Right case
-    if (balance > 1 && key > node->left->key) {
-        node->left = rotateLeft(node->left);
-        return rotateRight(node);
-    }
-
-    // Right Left case
-    if (balance < -1 && key < node->right->key) {
-        node->right = rotateRight(node->right);
-        return rotateLeft(node);
-    }
-
-    return node;  // Return the (possibly rotated) node
+    return balance(node);  // Balance the tree and return the new root
 }
 
 AVLNode* AVL::deleteNode(AVLNode* node, int key) {
-    if (!node) return node;
+    if (node == nullptr) {
+        return node;  // Key not found
+    }
 
     // Recur down the tree
-    if (key < node->key)
+    if (key < node->key) {
         node->left = deleteNode(node->left, key);
-    else if (key > node->key)
+    } else if (key > node->key) {
         node->right = deleteNode(node->right, key);
-    else {
-        // Node with one or no children
-        if (!node->left || !node->right) {
+    } else {
+        // Node with one or no child
+        if ((node->left == nullptr) || (node->right == nullptr)) {
             AVLNode* temp = node->left ? node->left : node->right;
-            if (!temp) {
+            if (temp == nullptr) {
                 temp = node;
                 node = nullptr;
             } else {
-                *node = *temp;
+                *node = *temp;  // Copy the contents of the non-empty child
             }
             delete temp;
         } else {
-            // Node with two children: get the inorder successor
+            // Node with two children: Get the inorder successor
             AVLNode* temp = minValueNode(node->right);
             node->key = temp->key;
-            node->right = deleteNode(node->right, temp->key);
+            node->right = deleteNode(node->right, temp->key);  // Delete the inorder successor
         }
     }
 
-    // If the tree had only one node, return
-    if (!node) return node;
+    if (node == nullptr) return node;
 
-    // Update height of the current node
-    node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));
-
-    int balance = getBalanceFactor(node);
-
-    // Left Left case
-    if (balance > 1 && getBalanceFactor(node->left) >= 0)
-        return rotateRight(node);
-
-    // Left Right case
-    if (balance > 1 && getBalanceFactor(node->left) < 0) {
-        node->left = rotateLeft(node->left);
-        return rotateRight(node);
-    }
-
-    // Right Right case
-    if (balance < -1 && getBalanceFactor(node->right) <= 0)
-        return rotateLeft(node);
-
-    // Right Left case
-    if (balance < -1 && getBalanceFactor(node->right) > 0) {
-        node->right = rotateRight(node->right);
-        return rotateLeft(node);
-    }
-
-    return node;
+    node->height = 1 + std::max(getHeight(node->left), getHeight(node->right));  // Update height
+    return balance(node);  // Balance the tree
 }
 
-AVLNode* AVL::minValueNode(AVLNode* node) {
-    AVLNode* current = node;
-    while (current->left)
-        current = current->left;
-    return current;
+int AVL::calculateDepth(AVLNode* node, int key, int depth) const {
+    if (node == nullptr) {
+        return -1;  // Key not found
+    }
+    if (node->key == key) {
+        return depth;  // Found the key
+    }
+
+    int leftDepth = calculateDepth(node->left, key, depth + 1);
+    if (leftDepth != -1) return leftDepth;
+
+    return calculateDepth(node->right, key, depth + 1);
+}
+
+int AVL::calculateOrder(AVLNode* node, int key, int& order) const {
+    if (node == nullptr) {
+        return -1;  // Key not found
+    }
+
+    int leftOrder = calculateOrder(node->left, key, order);
+    if (leftOrder != -1) return leftOrder;
+
+    if (node->key == key) {
+        return order;  // Return the in-order position
+    }
+    order++;  // Increment order for the next node
+    return calculateOrder(node->right, key, order);
 }
 
 int AVL::getHeight(AVLNode* node) const {
-    return node ? node->height : 0;
+    return (node == nullptr) ? 0 : node->height;
 }
 
 int AVL::getBalanceFactor(AVLNode* node) const {
-    return node ? getHeight(node->left) - getHeight(node->right) : 0;
+    return (node == nullptr) ? 0 : getHeight(node->left) - getHeight(node->right);
 }
 
 AVLNode* AVL::rotateRight(AVLNode* y) {
     AVLNode* x = y->left;
     AVLNode* T2 = x->right;
 
-    // Perform rotation
     x->right = y;
     y->left = T2;
 
-    // Update heights
     y->height = std::max(getHeight(y->left), getHeight(y->right)) + 1;
     x->height = std::max(getHeight(x->left), getHeight(x->right)) + 1;
 
@@ -212,68 +246,45 @@ AVLNode* AVL::rotateLeft(AVLNode* x) {
     AVLNode* y = x->right;
     AVLNode* T2 = y->left;
 
-    // Perform rotation
     y->left = x;
     x->right = T2;
 
-    // Update heights
     x->height = std::max(getHeight(x->left), getHeight(x->right)) + 1;
     y->height = std::max(getHeight(y->left), getHeight(y->right)) + 1;
 
     return y;
 }
 
-void AVL::clear(AVLNode* node) {
-    if (node) {
-        clear(node->left);
-        clear(node->right);
-        delete node;
+AVLNode* AVL::minValueNode(AVLNode* node) {
+    AVLNode* current = node;
+    while (current && current->left != nullptr) {
+        current = current->left;
     }
+    return current;
 }
 
-int AVL::calculateDepth(AVLNode* node, int key, int depth) const {
-    if (!node) return -1;  // Node not found
-    if (key == node->key) return depth;
-    if (key < node->key) return calculateDepth(node->left, key, depth + 1);
-    return calculateDepth(node->right, key, depth + 1);
-}
+// Balance the AVL tree
+AVLNode* AVL::balance(AVLNode* node) {
+    int balanceFactor = getBalanceFactor(node);
 
-int AVL::calculateOrder(AVLNode* node, int key, int& order) const {
-    if (!node) return -1;  // Node not found
-    if (key < node->key) {
-        return calculateOrder(node->left, key, order);
-    } else if (key > node->key) {
-        order += (node->left ? node->left->height : 0) + 1;  // Add left subtree size
-        return calculateOrder(node->right, key, order);
+    // Left heavy (Right rotation)
+    if (balanceFactor > 1) {
+        // Left-Right case (double rotation)
+        if (getBalanceFactor(node->left) < 0) {
+            node->left = rotateLeft(node->left);  // Left-Right rotation
+        }
+        return rotateRight(node);  // Right rotation
     }
-    if (node->left) order += node->left->height;
-    return order;  // Key found
-}
 
-// Search Function
-bool AVL::search(int key) const {
-    return searchHelper(root, key);  // Helper function for searching
-}
-
-// The missing searchHelper function
-bool AVL::searchHelper(AVLNode* node, int key) const {
-    if (node == nullptr) {
-        return false;  // Key not found
+    // Right heavy (Left rotation)
+    if (balanceFactor < -1) {
+        // Right-Left case (double rotation)
+        if (getBalanceFactor(node->right) > 0) {
+            node->right = rotateRight(node->right);  // Right-Left rotation
+        }
+        return rotateLeft(node);  // Left rotation
     }
-    if (key == node->key) {
-        return true;  // Key found
-    }
-    if (key < node->key) {
-        return searchHelper(node->left, key);  // Search in the left subtree
-    } else {
-        return searchHelper(node->right, key);  // Search in the right subtree
-    }
-}
 
-void AVL::draw(sf::RenderWindow& window) {
-    // For drawing AVL Tree, you need to implement visualization with SFML (optional)
-}
-
-void AVL::display() const {
-    print();  // Display AVL tree using in-order traversal
+    // Node is balanced
+    return node;
 }

@@ -65,9 +65,10 @@ public:
     }
 };
 
-// Load data from file asynchronously and insert into all ADTs
-void loadDataFromFile(const std::string& filename, std::vector<int>& data, std::atomic<bool>& done, 
-                      Heap& heap, Stack& stack, Queue& queue, BTree& btree, PriorityQueue& priorityQueue) {
+// Load data from file and insert into all ADTs
+void loadDataFromFile(const std::string& filename, std::vector<int>& data, std::atomic<bool>& done,
+                      ADTType currentADT, Heap& heap, BST& bst, AVL& avl, Stack& stack, Queue& queue,
+                      BTree& btree, PriorityQueue& priorityQueue, RedBlackTree& rbt) {
     std::ifstream file(filename);
     std::string line;
 
@@ -76,11 +77,17 @@ void loadDataFromFile(const std::string& filename, std::vector<int>& data, std::
         try {
             int value = std::stoi(line);
             data.push_back(value);
+
+            // Insert into all ADTs
             heap.insert(value);
+            bst.insert(value);
+            avl.insert(value);
             stack.push(value);
             queue.enqueue(value);
             btree.insert(value);
-            priorityQueue.insert(value, value);  
+            priorityQueue.insert(value, value);
+            rbt.insert(value);
+
             std::cout << "Inserted value: " << value << " into all ADTs.\n";
         } catch (const std::exception& e) {
             std::cerr << "Error reading value from file: " << e.what() << "\n";
@@ -108,22 +115,14 @@ void viewADT(ADTType currentADT, Heap& heap, BST& bst, AVL& avl, BTree& btree, R
 
     // Call the draw method from the selected ADT class
     switch (currentADT) {
-        case ADTType::HEAP:
-            heap.draw(window, font);
-            break;
-        case ADTType::STACK:
-            stack.draw(window, font);
-            break;
-        case ADTType::QUEUE:
-            queue.draw(window, font);
-            break;
-        case ADTType::BTREE:
-            btree.draw(window, font);
-            break;
-        case ADTType::PRIORITY_QUEUE:
-            priorityQueue.draw(window, font);
-            break;
-        // Add cases for other ADTs as needed
+        case ADTType::HEAP: heap.draw(window, font); break;
+        case ADTType::AVL: avl.draw(window, font); break;
+        case ADTType::STACK: stack.draw(window, font); break;
+        case ADTType::QUEUE: queue.draw(window, font); break;
+        case ADTType::BTREE: btree.draw(window, font); break;
+        case ADTType::PRIORITY_QUEUE: priorityQueue.draw(window, font); break;
+        case ADTType::RED_BLACK_TREE: rbt.draw(window, font); break;
+        case ADTType::BST: bst.draw(window, font); break;
     }
 
     sf::Text backText("Press Backspace to return", font, 20);
@@ -183,8 +182,9 @@ int main() {
                                 std::string fileName = browseFile();
                                 done = false;
                                 fileThread = std::thread(loadDataFromFile, fileName, std::ref(data), std::ref(done),
-                                                         std::ref(heap), std::ref(stack), std::ref(queue),
-                                                         std::ref(btree), std::ref(priorityQueue));
+                                                         currentADT, std::ref(heap), std::ref(bst), std::ref(avl),
+                                                         std::ref(stack), std::ref(queue), std::ref(btree),
+                                                         std::ref(priorityQueue), std::ref(rbt));
                             }
                         }
                         break;

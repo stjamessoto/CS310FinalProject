@@ -1,4 +1,3 @@
-// RedBlack.h
 #ifndef REDBLACK_H
 #define REDBLACK_H
 
@@ -10,6 +9,7 @@
 
 enum Color { RED, BLACK };
 
+// Red-Black Tree Node
 struct RBNode {
     int data;
     Color color;
@@ -36,9 +36,15 @@ private:
     RBNode* minimum(RBNode* node);
     void deleteNodeHelper(RBNode* node, int key);
 
-    // Add declarations for rotations
+    // Rotation functions
     void leftRotate(RBNode* x);
     void rightRotate(RBNode* x);
+
+    // Recursively delete all nodes
+    void clear(RBNode* node);
+
+    // Helper function to recursively draw the tree
+    void drawNode(sf::RenderWindow& window, RBNode* node, float x, float y, const sf::Font& font);
 
 public:
     RedBlackTree();
@@ -50,7 +56,9 @@ public:
     void display();
     void print(); // New function to print the tree
     void parseFromFile(const std::string& filename);
-    void draw(sf::RenderWindow& window);
+
+    // Modified to accept window and font for drawing
+    void draw(sf::RenderWindow& window, const sf::Font& font);
 };
 
 #endif // REDBLACK_H
