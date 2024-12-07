@@ -65,32 +65,34 @@ public:
     }
 };
 
-// Load data from file asynchronously and insert into heap, stack, queue, and btree
+// Load data from file asynchronously and insert into all ADTs
 void loadDataFromFile(const std::string& filename, std::vector<int>& data, std::atomic<bool>& done, 
-                      Heap& heap, Stack& stack, Queue& queue, BTree& btree) {
+                      Heap& heap, Stack& stack, Queue& queue, BTree& btree, PriorityQueue& priorityQueue) {
     std::ifstream file(filename);
     std::string line;
 
     data.clear();
     while (std::getline(file, line)) {
         try {
-            int value = std::stoi(line);  // Convert the line to an integer
-            data.push_back(value);        // Add it to the data vector
-            heap.insert(value);           // Insert it directly into the heap
-            stack.push(value);            // Insert the value into the stack
-            queue.enqueue(value);         // Insert the value into the queue
-            btree.insert(value);          // Insert the value into the BTree
-            std::cout << "Inserted value: " << value << " into the heap, stack, queue, and btree." << std::endl;
+            int value = std::stoi(line);
+            data.push_back(value);
+            heap.insert(value);
+            stack.push(value);
+            queue.enqueue(value);
+            btree.insert(value);
+            priorityQueue.insert(value, value);  
+            std::cout << "Inserted value: " << value << " into all ADTs.\n";
         } catch (const std::exception& e) {
             std::cerr << "Error reading value from file: " << e.what() << "\n";
         }
     }
     done = true;
-    std::cout << "File loaded and data inserted into the heap, stack, queue, and btree." << std::endl;
+    std::cout << "File loaded and data inserted into all ADTs.\n";
 }
 
+// Mock function to select a file
 std::string browseFile() {
-    return "sample.txt"; // Here you would add logic to browse and choose a file
+    return "sample.txt";  // Replace this with actual file browsing logic if needed
 }
 
 // View and display the current ADT state
@@ -107,18 +109,21 @@ void viewADT(ADTType currentADT, Heap& heap, BST& bst, AVL& avl, BTree& btree, R
     // Call the draw method from the selected ADT class
     switch (currentADT) {
         case ADTType::HEAP:
-            heap.draw(window, font);  // Draw the heap structure
+            heap.draw(window, font);
             break;
         case ADTType::STACK:
-            stack.draw(window, font);  // Draw the stack structure
+            stack.draw(window, font);
             break;
         case ADTType::QUEUE:
-            queue.draw(window, font);  // Draw the queue structure
+            queue.draw(window, font);
             break;
         case ADTType::BTREE:
-            btree.draw(window, font);  // Draw the BTree structure (assuming BTree has a draw method)
+            btree.draw(window, font);
             break;
-        // Add cases for other ADTs here if needed
+        case ADTType::PRIORITY_QUEUE:
+            priorityQueue.draw(window, font);
+            break;
+        // Add cases for other ADTs as needed
     }
 
     sf::Text backText("Press Backspace to return", font, 20);
@@ -129,7 +134,6 @@ void viewADT(ADTType currentADT, Heap& heap, BST& bst, AVL& avl, BTree& btree, R
     window.display();
 }
 
-// Main Function
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML ADT Menu");
 
@@ -168,55 +172,56 @@ int main() {
 
             if (event.type == sf::Event::KeyPressed) {
                 switch (appState) {
-                case AppState::MAIN_MENU:
-                    if (event.key.code == sf::Keyboard::Up) mainMenu.moveUp();
-                    if (event.key.code == sf::Keyboard::Down) mainMenu.moveDown();
-                    if (event.key.code == sf::Keyboard::Enter) {
-                        int selectedOption = mainMenu.getSelectedItemIndex();
-                        if (selectedOption == 0) appState = AppState::ADT_SELECTION;
-                        else if (selectedOption == 4) appState = AppState::VIEW_ADT;
-                        else if (selectedOption == 5) {  // When selecting "Import from File"
-                            std::string fileName = browseFile();
-                            done = false;
-                            fileThread = std::thread(loadDataFromFile, fileName, std::ref(data), std::ref(done), 
-                                                     std::ref(heap), std::ref(stack), std::ref(queue), std::ref(btree)); // Load and insert into heap, stack, queue, and btree
+                    case AppState::MAIN_MENU:
+                        if (event.key.code == sf::Keyboard::Up) mainMenu.moveUp();
+                        if (event.key.code == sf::Keyboard::Down) mainMenu.moveDown();
+                        if (event.key.code == sf::Keyboard::Enter) {
+                            int selectedOption = mainMenu.getSelectedItemIndex();
+                            if (selectedOption == 0) appState = AppState::ADT_SELECTION;
+                            else if (selectedOption == 4) appState = AppState::VIEW_ADT;
+                            else if (selectedOption == 5) {
+                                std::string fileName = browseFile();
+                                done = false;
+                                fileThread = std::thread(loadDataFromFile, fileName, std::ref(data), std::ref(done),
+                                                         std::ref(heap), std::ref(stack), std::ref(queue),
+                                                         std::ref(btree), std::ref(priorityQueue));
+                            }
                         }
-                    }
-                    break;
+                        break;
 
-                case AppState::ADT_SELECTION:
-                    if (event.key.code == sf::Keyboard::Up) adtMenu.moveUp();
-                    if (event.key.code == sf::Keyboard::Down) adtMenu.moveDown();
-                    if (event.key.code == sf::Keyboard::Enter) {
-                        currentADT = static_cast<ADTType>(adtMenu.getSelectedItemIndex());
-                        appState = AppState::ADT_OPERATIONS;
-                    }
-                    break;
+                    case AppState::ADT_SELECTION:
+                        if (event.key.code == sf::Keyboard::Up) adtMenu.moveUp();
+                        if (event.key.code == sf::Keyboard::Down) adtMenu.moveDown();
+                        if (event.key.code == sf::Keyboard::Enter) {
+                            currentADT = static_cast<ADTType>(adtMenu.getSelectedItemIndex());
+                            appState = AppState::ADT_OPERATIONS;
+                        }
+                        break;
 
-                case AppState::ADT_OPERATIONS:
-                    if (event.key.code == sf::Keyboard::Up) operationMenu.moveUp();
-                    if (event.key.code == sf::Keyboard::Down) operationMenu.moveDown();
-                    if (event.key.code == sf::Keyboard::Enter) {
-                        int option = operationMenu.getSelectedItemIndex();
-                        if (option == 3) appState = AppState::VIEW_ADT;
-                    }
-                    break;
+                    case AppState::ADT_OPERATIONS:
+                        if (event.key.code == sf::Keyboard::Up) operationMenu.moveUp();
+                        if (event.key.code == sf::Keyboard::Down) operationMenu.moveDown();
+                        if (event.key.code == sf::Keyboard::Enter) {
+                            int option = operationMenu.getSelectedItemIndex();
+                            if (option == 3) appState = AppState::VIEW_ADT;
+                        }
+                        break;
 
-                case AppState::VIEW_ADT:
-                    if (event.key.code == sf::Keyboard::BackSpace) appState = AppState::MAIN_MENU;
-                    break;
+                    case AppState::VIEW_ADT:
+                        if (event.key.code == sf::Keyboard::BackSpace) appState = AppState::MAIN_MENU;
+                        break;
                 }
             }
         }
 
-        if (fileThread.joinable() && done) fileThread.join();  // Wait until file loading and insertion is done
+        if (fileThread.joinable() && done) fileThread.join();
 
         window.clear();
         switch (appState) {
-        case AppState::MAIN_MENU: mainMenu.draw(window); break;
-        case AppState::ADT_SELECTION: adtMenu.draw(window); break;
-        case AppState::ADT_OPERATIONS: operationMenu.draw(window); break;
-        case AppState::VIEW_ADT: viewADT(currentADT, heap, bst, avl, btree, rbt, stack, queue, priorityQueue, data, window, font); break;
+            case AppState::MAIN_MENU: mainMenu.draw(window); break;
+            case AppState::ADT_SELECTION: adtMenu.draw(window); break;
+            case AppState::ADT_OPERATIONS: operationMenu.draw(window); break;
+            case AppState::VIEW_ADT: viewADT(currentADT, heap, bst, avl, btree, rbt, stack, queue, priorityQueue, data, window, font); break;
         }
         window.display();
     }

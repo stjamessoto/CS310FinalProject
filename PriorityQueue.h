@@ -18,21 +18,29 @@ private:
 public:
     PriorityQueue() = default;
 
-    void enqueue(int value, int priority = 0);
-    void dequeue();
+    // Insert a value with a given priority (default is 0 for normal priority)
+    void insert(int value, int priority = 0);
+
+    // Remove the highest priority (lowest value) element
+    void remove();
+
+    // Peek at the element with the highest priority without removing it
     std::pair<int, int> peek() const;
+
+    // Check if the priority queue is empty
     bool isEmpty() const;
 
     // Display function to print the contents of the priority queue
     void print() const;
 
-    void draw(sf::RenderWindow& window);
+    // Draw the priority queue (for SFML)
+    void draw(sf::RenderWindow& window, const sf::Font& font);
 
-    // File parsing
+    // Parse from file
     void parseFromFile(const std::string& fileName);
 
     // Getter for the internal heap data (returns the heap as a vector of pairs)
-    std::vector<std::pair<int, int>> getData() const;  // Declaration only
+    std::vector<std::pair<int, int>> getData() const;
 
     // Getter for values (returns just the values from the heap)
     std::vector<int> getValues() const;

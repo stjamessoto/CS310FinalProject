@@ -1,4 +1,3 @@
-//PriorityQueue.cpp
 #include "PriorityQueue.h"
 #include <fstream>
 #include <iostream>
@@ -34,16 +33,16 @@ void PriorityQueue::heapifyDown(int index) {
     }
 }
 
-// Enqueue an element with a priority
-void PriorityQueue::enqueue(int value, int priority) {
+// Insert an element with a priority
+void PriorityQueue::insert(int value, int priority) {
     heap.push_back({priority, value});
     heapifyUp(heap.size() - 1);
 }
 
-// Dequeue the root element (remove the element with the highest priority)
-void PriorityQueue::dequeue() {
+// Remove the root element (remove the element with the highest priority)
+void PriorityQueue::remove() {
     if (isEmpty()) {
-        std::cerr << "Priority Queue is empty, cannot dequeue!" << std::endl;
+        std::cerr << "Priority Queue is empty, cannot remove!" << std::endl;
         return;
     }
 
@@ -80,7 +79,7 @@ void PriorityQueue::print() const {
 }
 
 // Draw the priority queue using SFML
-void PriorityQueue::draw(sf::RenderWindow& window) {
+void PriorityQueue::draw(sf::RenderWindow& window, const sf::Font& font) {
     if (heap.empty()) return;
 
     float width = 50.0f;
@@ -100,10 +99,6 @@ void PriorityQueue::draw(sf::RenderWindow& window) {
         node.setFillColor(sf::Color::Green);
 
         // Draw the priority value inside the rectangle
-        sf::Font font;
-        if (!font.loadFromFile("edosz.ttf")) {
-            std::cerr << "Failed to load font!" << std::endl;
-        }
         sf::Text text(std::to_string(heap[i].first), font, 20);
         text.setFillColor(sf::Color::White);
         text.setPosition(x + width / 4, y + height / 4);
@@ -152,8 +147,8 @@ void PriorityQueue::parseFromFile(const std::string& filename) {
 
     // Read the file line by line
     while (file >> value >> priority) {
-        // Enqueue the value with the specified priority
-        enqueue(value, priority);
+        // Insert the value with the specified priority
+        insert(value, priority);
     }
 
     // Close the file
@@ -185,4 +180,3 @@ std::vector<int> PriorityQueue::getPriorities() const {
     }
     return priorities;
 }
-
